@@ -1,6 +1,8 @@
 package uta.cse3310;
+import java.util.List;
+import java.util.ArrayList;
 
-public class leaderboard
+public class Leaderboard
 {
     public Leaderboard()
     {
@@ -13,9 +15,11 @@ public class leaderboard
 
     }
 
-    public List<player> sorted(int x) // Sort the player
+    List<player> sorted(int x) // Sort the player
     {
-
+        List<player> oneone = new ArrayList<>();
+        return oneone;
     }
+        
 
 }

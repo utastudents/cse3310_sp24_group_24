@@ -1,13 +1,16 @@
 package uta.cse3310;
-import javio.io.File;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
 
-public class bank
+public class Bank
 {
-    public String checklength
+    public String checklength()
     {
-
+        String ok="";
+        return ok;
     }
 
     public void readfile(String file)
@@ -18,13 +21,14 @@ public class bank
     
     public List<String> getWords(){
         List<String> gamelist = new ArrayList<>();
-        // Add Stuff 
+        //Add Stuff 
 
         return gamelist;
     }
     public List<String> words()
     {
-
+        List<String> usethis = new ArrayList<>();
+        return usethis;
     }
 
 
