@@ -11,28 +11,30 @@ public class Grid {
     private int boarderwidth, boarderlength;
     private Bank Usedwords;
 
-    public Grid() {
+    
 
+    public Grid() {
+        Bank FinalBank = new Bank();
     }
 
-    public void fillwords(final : Bank) {
-
+    public void fillwords(final int FinalBank) {
+        return;
     }
 
     public void fillLetters() {
-
+        return;
     }
 
     public int densityCheck() {
-
+        return 1;
     }
 
     public int orientationCheck() {
-
+        return 1;
     }
 
     public String FillerLettersRatio() {
-
+        return "FillerLettersRatio";
     }
 
 }
