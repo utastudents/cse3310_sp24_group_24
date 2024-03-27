@@ -5,7 +5,7 @@ public class lobby {
     private void chatBox(){
         String message;
     }
-    public boolean readAll(){
+    public boolean readyAll(){
         return true;
     }
 }
