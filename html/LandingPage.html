@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            text-align: center;
+            margin: 50px; /* Adjust the value as needed for the desired spacing */
+            background-color: #8ac1b1;
+        }
+        h1, h3, p, label, input {
+            margin-bottom: 20px; /* Adjust the value as needed for the desired spacing */
+        }
+        .landing-page {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <h1>WORD GAME</h1>
+        <img src="https://media.giphy.com/media/3o7aCTXVcHJgJ4yoeI/giphy.gif" alt="Pirate">
+        <h3>Type your Name to Enter the Lobby</h3>
+        <form id="nameForm" onsubmit="loadLobby(); return false;">
+            <label for="fname">First Name:</label><br>
+            <input type="text" id="fname" name="fname" required><br>
+            <input type="submit" value="Join">
+        </form>
+    </div>
+    
+
+    <script>
+        function loadLobby() 
+        {
+            var playerName = document.getElementById("fname").value;
+            localStorage.setItem('myValue', playerName);
+
+            // Establish Websocket connection
+            const socket = new WebSocket('ws://localhost:3000');
+
+            socket.onopen = function()
+            {
+                console.log('Connect to server');
+                //Send players names to server
+                socket.send(playerName);
+            }
+            window.location.href = "A_Lobby.html";
+        }
+    </script>
+</body>
+</html>
