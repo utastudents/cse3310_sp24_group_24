@@ -7,7 +7,7 @@ public class banktest {
 
     public static void main(String[] args){
 
-        System.out.println("working...");
+        //System.out.println("...working...");
 
         double density,charCount,grid,check;
         density = 0.67;
@@ -44,7 +44,6 @@ public class banktest {
         //density check
         while(check<density){
             String oneword = wordlist.get(picker.nextInt(wordlist.size()));
-            //newList.add(oneword);
             
             //if randomly choosen word already in list, pick new word
             //counting letters of words added.
@@ -56,16 +55,18 @@ public class banktest {
                     }
                 }
             }
-            
-
+            //desnity check
             check=charCount/grid;
-
         }
 
+        /* 
+        System.out.println("////////////start of list");
         for(String b : newList){
             System.out.println(b);
         }
-       //System.out.println(charCount+","+check);
-
+        System.out.println("////////////end of list");
+       System.out.println("Letter Count: "+ charCount+" , Density ratio: "+check);
+        */
+       
     }    
 }
