@@ -5,7 +5,7 @@ import java.util.*;
 public class Bank
 {
    private double density,charCount,grid,check;
-   private String copy, filename,some;
+   private String copy, filename;
 
    List<String> gamelist = new ArrayList<>();
    Random picker = new Random();
