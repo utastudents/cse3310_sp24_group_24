@@ -27,6 +27,7 @@ public class Bank
     public void readfile(String file)
     {
         file = filename;
+        filename = "words.txt";
         try{
             File wordfile = new File(filename);
             Scanner input = new Scanner (wordfile);
