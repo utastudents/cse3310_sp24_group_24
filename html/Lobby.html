@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./css/lobby_styles.css">
+<title>Word Game Lobby</title>
+</head>
+<body>
+    <h1 style="text-align: center;">WORD GAME LOBBY</h1>
+    <div class="container">
+        <div class="left-column">
+            <div class="box">
+                <h1 class="header_text">Nick Handles</h1>
+                <ol id="playerNick" class="player-nick"></ol>
+            </div>
+            <div class="box">
+                <h1 class="header_text">Leaderboard</h1>
+                <div class="button-container">
+                    <button id="button" onclick="view_leaderboard()">Click to View</button>
+                </div>
+        </div>
+        </div>
+
+        <div class="chatbox-container">
+            <div class="chatbox" id="chatbox">
+                <div class="message bot-message">Display Message</div>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <div class="box">
+                <h1 class="header_text">Players Ready</h1>
+            </div>
+            <div class="box">
+                <h1 class="header_text">Waiting for Host</h1>
+            </div>
+        </div>
+    </div>
+    
+
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    
+    <script>
+        const serverUrl = 'ws://' + window.location.hostname + ':9880';
+        const socket = new WebSocket(serverUrl);
+
+        socket.onopen = function() {
+            console.log('Connected to server');
+            const playerName = sessionStorage.getItem('myValue');
+            if (playerName) {
+                socket.send("join:" + playerName);
+            }
+        };
+
+        socket.onmessage = function(event) {
+            console.log('Message from server: ', event.data);
+            const message = event.data;
+            if (message.startsWith("nickList:")) {
+                updateNickList(message.substring(9));
+            } else {
+                displayMessage(message, "user-message");
+            }
+        };
+
+        socket.onclose = function() {
+            console.log('WebSocket connection closed');
+            displayMessage("Server connection closed", "bot-message");
+        };
+
+        socket.onerror = function(error) {
+            console.error('WebSocket Error: ', error);
+        };
+
+        function sendMessage() {
+            const userInput = document.getElementById("userInput");
+            const message = userInput.value.trim();
+            const playerName = localStorage.getItem('myValue') || 'Anonymous';
+            if (message) {
+                socket.send("msg:" + playerName + ": " + message);
+                displayMessage(playerName + ": " + message, "user-message");
+                userInput.value = '';
+            }
+        }
+
+        function displayMessage(message, className) {
+            const chatbox = document.getElementById("chatbox");
+            const messageElement = document.createElement("div");
+            messageElement.textContent = message;
+            messageElement.classList.add("message", className);
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight; // Keep the chat scrolled to the bottom
+        }
+
+        function updateNickList(nicks) {
+            const nickArray = nicks.split(",");
+            const playerNick = document.getElementById("playerNick");
+            playerNick.innerHTML = ""; // Clear existing entries
+            nickArray.forEach(nick => {
+                const li = document.createElement("li");
+                li.textContent = nick;
+                playerNick.appendChild(li);
+            });
+        }
+        function view_leaderboard()
+        {
+            window.location.href = 'Leaderboard.html';
+        }
+        
+    </script>
+</body>
+</html>
