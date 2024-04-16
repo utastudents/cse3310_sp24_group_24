@@ -10,9 +10,9 @@ public class WordSearchGame{
     private ArrayList<String> wordsToFind = new ArrayList<String>(); //list of words that are left to find
     private String word = ""; //the word user has formed by clicking
 
-    private boolean selected;
-    private xPos; //row button is on
-    private yPos; //col button is on
+    private boolean foundWord;
+    private int xPos; //row button is on
+    private int yPos; //col button is on
 
 
     public WordSearchGame(){
@@ -41,7 +41,7 @@ public class WordSearchGame{
     }
     public void setFoundWord(boolean foundWord) {
 		this.foundWord = foundWord;
-		if(foundWord)
+		if(foundWord){}
 			//set color to players color
 	}
 
