@@ -1,6 +1,8 @@
 package uta.cse3310;
+import java.util.ArrayList;
 /*
 Grid is array of buttons containing letters
+Words made up of buttons 
 */
 public class WordSearchGame{
     public PlayerType players;
@@ -8,16 +10,20 @@ public class WordSearchGame{
     private ArrayList<String> wordsToFind = new ArrayList<String>(); //list of words that are left to find
     private String word = ""; //the word user has formed by clicking
 
+    private boolean selected;
+    private xPos; //row button is on
+    private yPos; //col button is on
+
 
     public WordSearchGame(){
-    //what does this consist of exactly
+    //
 
     }
 
     public void wordfound(){
         //if word user formed are in the words left to find
         if(wordsToFind.contains(word)){
-            //change color background
+            
         }
         wordsToFind.remove(word); //if found remove word from words to find
 
@@ -28,8 +34,15 @@ public class WordSearchGame{
 
     }
 
+    //user selects word by via clicking operation
     public void clickOperation(){
+
         
     }
+    public void setFoundWord(boolean foundWord) {
+		this.foundWord = foundWord;
+		if(foundWord)
+			//set color to players color
+	}
 
 }
