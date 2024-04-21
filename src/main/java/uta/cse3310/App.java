@@ -45,6 +45,8 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -66,6 +68,7 @@ public class App extends WebSocketServer {
   // All games currently underway on this server are stored in
   // the vector ActiveGames
   private Vector<Game> ActiveGames = new Vector<Game>();
+  private List<WebSocket> clients = new ArrayList<>();
 
   private int GameId = 1;
 
@@ -77,6 +80,7 @@ public class App extends WebSocketServer {
 
   public App(int port) {
     super(new InetSocketAddress(port));
+    
   }
 
   public App(InetSocketAddress address) {
@@ -91,6 +95,8 @@ public class App extends WebSocketServer {
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
     connectionId++;
+
+    clients.add(conn);
 
     System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected");
 
@@ -156,35 +162,30 @@ public class App extends WebSocketServer {
     // Retrieve the game tied to the websocket connection
     Game G = conn.getAttachment();
     G = null;
+    clients.remove(conn);
   }
 
   @Override
   public void onMessage(WebSocket conn, String message) {
-    System.out
-        .println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "-" + " " + escape(message));
+    System.out.println("Received message from client: " + message);
 
-    // Bring in the data from the webpage
-    // A UserEvent is all that is allowed at this point
-    GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
-    UserEvent U = gson.fromJson(message, UserEvent.class);
+    // Parse the incoming message to extract sender and content
+    Gson gson = new Gson();
+    Message receivedMessage = gson.fromJson(message, Message.class);
 
-    // Update the running time
-    stats.setRunningTime(Duration.between(startTime, Instant.now()).toSeconds());
+    // Construct the broadcast message
+    String broadcastMessage = gson.toJson(receivedMessage);
 
-    // Get our Game Object
-    Game G = conn.getAttachment();
-    G.Update(U);
+    
 
-    // send out the game state every time
-    // to everyone
-    String jsonString;
-    jsonString = gson.toJson(G);
+    // Broadcast the message to all connected clients except the sender
+    for (WebSocket client : clients) {
+        if (client != conn) {
+            client.send(broadcastMessage);
+        }
+    }
+}
 
-    System.out
-        .println("> " + Duration.between(startTime, Instant.now()).toMillis() + " " + "*" + " " + escape(jsonString));
-    broadcast(jsonString);
-  }
 
   @Override
   public void onMessage(WebSocket conn, ByteBuffer message) {
