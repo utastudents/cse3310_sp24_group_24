@@ -44,26 +44,26 @@
 
     
     <script>
-        const serverUrl = 'ws://' + window.location.hostname + ':9124';
-        const socket = new WebSocket(serverUrl);
+        var serverUrl;
+        serverUrl = 'ws://' + window.location.hostname + ':9124';
+        socket = new WebSocket(serverUrl);
 
         socket.onopen = function() {
             console.log('Connected to server');
-            const playerName = sessionStorage.getItem('myValue');
+            const playerName = sessionStorage.getItem('playerName');
             if (playerName) {
-                socket.send("join:" + playerName);
+                socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
             }
         };
 
         socket.onmessage = function(event) {
             console.log('Message from server: ', event.data);
-            const message = event.data;
-            if (message.startsWith("nickList:")) {
-                updateNickList(message.substring(9));
-            } else {
-                displayMessage(message, "user-message");
+            const message = JSON.parse(event.data);
+            if (message.sender && message.content) {
+                displayMessage(`${message.sender}: ${message.content}`, "user-message");
             }
         };
+
 
         socket.onclose = function() {
             console.log('WebSocket connection closed');
@@ -76,11 +76,12 @@
 
         function sendMessage() {
             const userInput = document.getElementById("userInput");
-            const message = userInput.value.trim();
-            const playerName = localStorage.getItem('myValue') || 'Anonymous';
-            if (message) {
-                socket.send("msg:" + playerName + ": " + message);
-                displayMessage(playerName + ": " + message, "user-message");
+            const content = userInput.value.trim();
+            const playerName = sessionStorage.getItem('playerName') || 'Anonymous';
+            if (content) {
+                const message = { sender: playerName, content: content };
+                socket.send(JSON.stringify(message));
+                displayMessage(`${playerName}: ${content}`, "user-message");
                 userInput.value = '';
             }
         }
@@ -104,11 +105,9 @@
                 playerNick.appendChild(li);
             });
         }
-        function view_leaderboard()
-        {
+        function view_leaderboard() {
             window.location.href = 'Leaderboard.html';
         }
-        
     </script>
 </body>
 </html>
