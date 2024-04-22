@@ -25,9 +25,6 @@ body {
     height: 100%;
     margin:10px;
     background-color: lightblue;
-    display: flex;
-    flex-direction: column;
-
 }
 .left-column
 {
@@ -98,27 +95,7 @@ input[type="text"] {
     box-sizing: border-box;
     margin-bottom: 10px;
 }
-#button {
-    width: 120px;
-    height: 50px;
-    padding-left: 10px 20px;
-    font-size: 16px;
-    color: white;
-    background-color: #4CAF50; /* Green background */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    display: block;
-    margin-top: auto;
-    margin-bottom: 100px;
-
-}
-.button-container {
-    flex-grow: 0; /* Takes up all available space */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding-top: 100px;
-   
-}
+.highlight {
+    background-color: red; 
+  }
+  

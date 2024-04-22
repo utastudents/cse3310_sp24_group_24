@@ -1,3 +1,4 @@
+package uta.cse3310;
 
 // This is example code provided to CSE3310 Fall 2022
 // You are free to use as is, or changed, any of the code provided
@@ -36,7 +37,6 @@
  *  OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uta.cse3310;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,9 +44,10 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -62,25 +63,18 @@ import java.time.Duration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
 public class App extends WebSocketServer {
 
-  // All games currently underway on this server are stored in
-  // the vector ActiveGames
+  // All games currently underway on this server are stored in the vector ActiveGames
   private Vector<Game> ActiveGames = new Vector<Game>();
-  private List<WebSocket> clients = new ArrayList<>();
-
+  public List<Player> AllPlayers = new ArrayList<Player>();
   private int GameId = 1;
-
   private int connectionId = 0;
-
   private Instant startTime;
-
   private Statistics stats;
 
   public App(int port) {
     super(new InetSocketAddress(port));
-    
   }
 
   public App(InetSocketAddress address) {
@@ -94,40 +88,46 @@ public class App extends WebSocketServer {
   @Override
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
+    //What number player you are
     connectionId++;
 
-    clients.add(conn);
+    //Message to show players address connected
+    System.out.println("\n" + conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected");
 
-    System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected");
-
+    //Create new instance of server event class
     ServerEvent E = new ServerEvent();
 
-    // search for a game needing a player
+    //Search for a game needing a player (existing game)
     Game G = null;
-    for (Game i : ActiveGames) {
-      if (i.Players == uta.cse3310.PlayerType.XPLAYER) {
+
+    for (Game i : ActiveGames) 
+    {
+      if (i.Players == uta.cse3310.PlayerType.XPLAYER) 
+      {
         G = i;
         System.out.println("found a match");
       }
     }
 
-    // No matches ? Create a new Game.
-    if (G == null) {
+    //No matches? Create a new Game.
+    if (G == null) 
+    {
       G = new Game(stats);
       G.GameId = GameId;
       GameId++;
-      // Add the first player
+      //Add the first player
       G.Players = PlayerType.XPLAYER;
       ActiveGames.add(G);
       System.out.println(" creating a new Game");
-    } else {
-      // join an existing game
+    } else 
+    {
+      //Join an existing game
       System.out.println(" not a new game");
       G.Players = PlayerType.OPLAYER;
       G.StartGame();
     }
 
-    // create an event to go to only the new player
+    //Create an event to go to only the new player
     E.YouAre = G.Players;
     E.GameId = G.GameId;
 
@@ -136,23 +136,31 @@ public class App extends WebSocketServer {
     // when we ask for it
     conn.setAttachment(G);
 
+    //Turning Java string to Json
     Gson gson = new Gson();
-
-    // Note only send to the single connection
+    //Note: only send to the single connection
     String jsonString = gson.toJson(E);
-    conn.send(jsonString);
-    System.out
-        .println("> " + Duration.between(startTime, Instant.now()).toMillis() + " " + connectionId + " "
-            + escape(jsonString));
+    //conn.send(jsonString);
+    
+    //Sending Grid to server
+    Message GridMessage = new Message(G.grid.WordSearchGrid);
+    String GridJSONString = gson.toJson(GridMessage);
+    conn.send(GridJSONString);
+
+    //Sending WordBank to server
+    Message WordBank = new Message(G.grid.WordsUsed);
+    String WordBankJSONString = gson.toJson(WordBank);
+    conn.send(WordBankJSONString);
+    
+    //System.out.println("> " + Duration.between(startTime, Instant.now()).toMillis() + " " + connectionId + " "+ escape(jsonString));
 
     // Update the running time
     stats.setRunningTime(Duration.between(startTime, Instant.now()).toSeconds());
 
     // The state of the game has changed, so lets send it to everyone
-    jsonString = gson.toJson(G);
-    System.out
-        .println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "*" + " " + escape(jsonString));
-    broadcast(jsonString);
+    //jsonString = gson.toJson(G);
+    //System.out.println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "*" + " " + escape(jsonString));
+    //broadcast(jsonString);
 
   }
 
@@ -162,34 +170,43 @@ public class App extends WebSocketServer {
     // Retrieve the game tied to the websocket connection
     Game G = conn.getAttachment();
     G = null;
-    clients.remove(conn);
   }
 
   @Override
   public void onMessage(WebSocket conn, String message) {
-    System.out.println("Received message from client: " + message);
-
-    // Parse the incoming message to extract sender and content
-    Gson gson = new Gson();
-    Message receivedMessage = gson.fromJson(message, Message.class);
-
-    // Construct the broadcast message
-    String broadcastMessage = gson.toJson(receivedMessage);
-
+    System.out.println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "-" + " " + escape(message));
     
-
-    // Broadcast the message to all connected clients except the sender
-    for (WebSocket client : clients) {
-        if (client != conn) {
-            client.send(broadcastMessage);
-        }
+    if(message.startsWith("PlayerInfo,") == true){
+      StringTokenizer string = new StringTokenizer(message,",");
+      string.nextToken();
+      AllPlayers.add(new Player(connectionId, string.nextToken(), 0, string.nextToken()));
     }
-}
 
+    // Bring in the data from the webpage
+    // A UserEvent is all that is allowed at this point
+    GsonBuilder builder = new GsonBuilder();
+    Gson gson = builder.create();
+    //UserEvent U = gson.fromJson(message, UserEvent.class);
+
+    // Update the running time
+    stats.setRunningTime(Duration.between(startTime, Instant.now()).toSeconds());
+
+    // Get our Game Object
+    Game G = conn.getAttachment();
+    //G.Update(U);
+
+    // send out the game state every time
+    // to everyone
+    String jsonString;
+    jsonString = gson.toJson(G);
+
+    //System.out.println("> " + Duration.between(startTime, Instant.now()).toMillis() + " " + "*" + " " + escape(jsonString));
+    //broadcast(jsonString);
+  }
 
   @Override
   public void onMessage(WebSocket conn, ByteBuffer message) {
-    System.out.println(conn + ": " + message);
+    //System.out.println(conn + ": " + message);
   }
 
   @Override
@@ -222,18 +239,18 @@ public class App extends WebSocketServer {
     }
     return retval;
   }
-
+  
   public static void main(String[] args) {
-
+    
     // Set up the http server
-    int port = 9024;
+    int port = 9080;
     HttpServer H = new HttpServer(port, "./html");
     H.start();
     System.out.println("http Server started on port: " + port);
 
     // create and start the websocket server
 
-    port = 9124;
+    port = 9880;
     App A = new App(port);
     A.setReuseAddr(true);
     A.start();
