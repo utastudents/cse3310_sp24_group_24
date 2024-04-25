@@ -12,8 +12,8 @@ public class Leaderboard {
         this.players = new ArrayList<>();
     }
 
-    public void addPlayer(String name, int score) {
-        Player newPlayer = new Player(name, score);
+    public void addPlayer(String name) {
+        Player newPlayer = new Player(name);
         players.add(newPlayer);
         sortPlayers();
     }

@@ -56,6 +56,8 @@ import org.java_websocket.server.WebSocketServer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 import java.time.Instant;
 import java.time.Duration;
 
@@ -69,8 +71,8 @@ public class App extends WebSocketServer {
   // the vector ActiveGames
   private Vector<Game> ActiveGames = new Vector<Game>();
   private List<WebSocket> clients = new ArrayList<>();
+  private List<Lobby> activeLobbies = new ArrayList<>();
 
-  private int GameId = 1;
 
   private int connectionId = 0;
 
@@ -102,68 +104,42 @@ public class App extends WebSocketServer {
 
     ServerEvent E = new ServerEvent();
 
-    // search for a game needing a player
-    Game G = null;
-    for (Game i : ActiveGames) {
-      if (i.Players == uta.cse3310.PlayerType.XPLAYER) {
-        G = i;
-        System.out.println("found a match");
-      }
+    String playerName = handshake.getFieldValue("playerName");
+
+    Player newPlayer = new Player(playerName);
+
+    Lobby lobby = findAvailableLobby();
+    if (lobby == null) {
+      lobby = createNewLobby();
     }
+    lobby.addPlayer(new Player(playerName)); // Add player to the lobby
 
-    // No matches ? Create a new Game.
-    if (G == null) {
-      G = new Game(stats);
-      G.GameId = GameId;
-      GameId++;
-      // Add the first player
-      G.Players = PlayerType.XPLAYER;
-      ActiveGames.add(G);
-      System.out.println(" creating a new Game");
-    } else {
-      // join an existing game
-      System.out.println(" not a new game");
-      G.Players = PlayerType.OPLAYER;
-      G.StartGame();
-    }
+    // Set the lobby as an attachment to the connection
+    conn.setAttachment(lobby);
 
-    // create an event to go to only the new player
-    E.YouAre = G.Players;
-    E.GameId = G.GameId;
-
-    // allows the websocket to give us the Game when a message arrives..
-    // it stores a pointer to G, and will give that pointer back to us
-    // when we ask for it
-    conn.setAttachment(G);
-
+    // Send lobby information to the connected client
     Gson gson = new Gson();
+    conn.send(gson.toJson(lobby));
 
-    // Note only send to the single connection
-    String jsonString = gson.toJson(E);
-    conn.send(jsonString);
-    System.out
-        .println("> " + Duration.between(startTime, Instant.now()).toMillis() + " " + connectionId + " "
-            + escape(jsonString));
-
-    // Update the running time
-    stats.setRunningTime(Duration.between(startTime, Instant.now()).toSeconds());
-
-    // The state of the game has changed, so lets send it to everyone
-    jsonString = gson.toJson(G);
-    System.out
-        .println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "*" + " " + escape(jsonString));
-    broadcast(jsonString);
-
+    // Broadcast lobby information to all clients
+    broadcast(gson.toJson(lobby));
   }
 
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
     System.out.println(conn + " has closed");
-    // Retrieve the game tied to the websocket connection
-    Game G = conn.getAttachment();
-    G = null;
-    clients.remove(conn);
-  }
+    Lobby lobby = conn.getAttachment();
+    if (lobby != null) {
+      Player player = lobby.getPlayerByName(conn.getAttachment()); // Retrieve player from the lobby
+      if (player != null) {
+        lobby.removePlayer(player); // Remove player from the lobby
+        clients.remove(conn);
+    }
+}
+
+    }
+  
+
 
   @Override
   public void onMessage(WebSocket conn, String message) {
@@ -174,17 +150,17 @@ public class App extends WebSocketServer {
     Message receivedMessage = gson.fromJson(message, Message.class);
 
     // Construct the broadcast message
-    String broadcastMessage = gson.toJson(receivedMessage);
+    String sender = receivedMessage.getSender();
+    String content = receivedMessage.getContent();
+    Message broadcastMessage = new Message(sender, content);
+    String jsonMessage = gson.toJson(broadcastMessage);
 
-    
-
-    // Broadcast the message to all connected clients except the sender
+    // Broadcast the message to all connected clients
     for (WebSocket client : clients) {
-        if (client != conn) {
-            client.send(broadcastMessage);
+        client.send(jsonMessage);
         }
     }
-}
+
 
 
   @Override
@@ -206,6 +182,21 @@ public class App extends WebSocketServer {
     setConnectionLostTimeout(0);
     stats = new Statistics();
     startTime = Instant.now();
+  }
+
+  private Lobby findAvailableLobby() {
+    for (Lobby lobby : activeLobbies) {
+      if (!lobby.isFull()) {
+        return lobby;
+      }
+    }
+    return null;
+  }
+
+  private Lobby createNewLobby() {
+    Lobby lobby = new Lobby();
+    activeLobbies.add(lobby);
+    return lobby;
   }
 
   private String escape(String S) {

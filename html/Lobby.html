@@ -1,10 +1,9 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="./css/lobby_styles.css">
-<title>Word Game Lobby</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/lobby_styles.css">
+    <title>Word Game Lobby</title>
 </head>
 <body>
     <h1 style="text-align: center;">WORD GAME LOBBY</h1>
@@ -13,13 +12,14 @@
             <div class="box">
                 <h1 class="header_text">Nick Handles</h1>
                 <ol id="playerNick" class="player-nick"></ol>
+                <button id="button" onclick="readyqueue()">Join Queue</button>
             </div>
             <div class="box">
                 <h1 class="header_text">Leaderboard</h1>
                 <div class="button-container">
                     <button id="button" onclick="view_leaderboard()">Click to View</button>
                 </div>
-        </div>
+            </div>
         </div>
 
         <div class="chatbox-container">
@@ -31,39 +31,46 @@
         <div class="right-column">
             <div class="box">
                 <h1 class="header_text">Players Ready</h1>
+                <ol id="playerQueue" class="player-nick"></ol> <!-- Corrected ID -->
             </div>
             <div class="box">
                 <h1 class="header_text">Waiting for Host</h1>
+                <button id="startButton" onclick="startGame()"> Begin</button>
             </div>
         </div>
     </div>
     
-
     <input type="text" id="userInput" placeholder="Type your message...">
     <button onclick="sendMessage()">Send</button>
 
-    
     <script>
         var serverUrl;
         serverUrl = 'ws://' + window.location.hostname + ':9124';
         socket = new WebSocket(serverUrl);
 
         socket.onopen = function() {
-            console.log('Connected to server');
+            let playerNames = sessionStorage.getItem('playerNames');
+            playerNames = playerNames ? JSON.parse(playerNames) : [];
+
             const playerName = sessionStorage.getItem('playerName');
             if (playerName) {
                 socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+                displayNick(playerName, playerNames);
+
+                // Store the updated list of player names back to sessionStorage
+                sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
             }
         };
 
         socket.onmessage = function(event) {
             console.log('Message from server: ', event.data);
             const message = JSON.parse(event.data);
+            
             if (message.sender && message.content) {
                 displayMessage(`${message.sender}: ${message.content}`, "user-message");
             }
+    
         };
-
 
         socket.onclose = function() {
             console.log('WebSocket connection closed');
@@ -95,16 +102,65 @@
             chatbox.scrollTop = chatbox.scrollHeight; // Keep the chat scrolled to the bottom
         }
 
-        function updateNickList(nicks) {
-            const nickArray = nicks.split(",");
-            const playerNick = document.getElementById("playerNick");
-            playerNick.innerHTML = ""; // Clear existing entries
-            nickArray.forEach(nick => {
-                const li = document.createElement("li");
-                li.textContent = nick;
-                playerNick.appendChild(li);
-            });
+        
+        function displayNick(playerName, playerNames) {
+    // Get the element where player names are displayed
+    const playerNick = document.getElementById('playerNick');
+    
+    // Create a new list item for the new player's name
+    const li = document.createElement('li');
+    li.textContent = playerName;
+    
+    // Append the new player's name to the list of player names displayed in the lobby
+    playerNick.appendChild(li);
+
+    // Add the new player's name to the list of player names
+    playerNames.push(playerName);
+
+    // Update the session storage with the updated list of player names
+    sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
+    
+    // Send the updated list of player names to the server
+    socket.send(JSON.stringify({ playerNames: playerNames }));
+}
+
+
+        function updateBeginButtonVisibility() {
+            const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
+            const beginButtonContainer = document.getElementById("beginButtonContainer");
+            if (playerNickItems.length === 1) {
+                beginButtonContainer.style.display = "block"; // Show Begin button if this is the first player
+            } else {
+                beginButtonContainer.style.display = "none"; // Hide Begin button for subsequent players
+            }
         }
+
+        function startGame() {
+            const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
+            if (playerNickItems.length > 0) {
+                const firstPlayer = playerNickItems[0].textContent;
+                alert(firstPlayer + " has started the game!");
+            } else {
+                alert("No players in the lobby yet!");
+            }
+        }
+
+        function readyqueue() {
+            const playerNick = sessionStorage.getItem('playerName');
+            if (playerNick) {
+                displayNick(playerNick, playerNames);
+                const playerQueue = document.getElementById('playerQueue');
+                const li = document.createElement('li');
+                li.textContent = playerNick;
+                playerQueue.appendChild(li);
+                // Send the player nick to the server
+                playerNames.push(playerName);
+                socket.send(JSON.stringify({ playerNick: playerName }));
+            } else {
+                console.error('Player name not found.');
+            }
+        }
+
         function view_leaderboard() {
             window.location.href = 'Leaderboard.html';
         }

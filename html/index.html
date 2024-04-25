@@ -28,36 +28,28 @@
     </div>
     
     <script>
+        // Establish WebSocket connection when the page loads
+        var serverUrl = 'ws://' + window.location.hostname + ':9124';
+        var socket = new WebSocket(serverUrl);
+        var playerNames = [];
+
+        socket.onopen = function() {
+            console.log('Connected to server');
+        };
+
         document.getElementById('nameForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            var playerName = document.getElementById("playerName").value;
+            const playerName = document.getElementById("playerName").value;
 
-            // Optional: Store the name in localStorage or sessionStorage
+           
+            
+            playerNames.push(playerName);
+            //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
             sessionStorage.setItem('playerName', playerName);
-
-            // Establish WebSocket connection
-            var serverUrl;
-            serverUrl = "ws://" + window.location.hostname + ":9124";
-            connection = new WebSocket(serverUrl);
-
-            connection.onopen = function() {
-                console.log("Connection open ...");
-                // Send data in a structured format if needed, like JSON
-                connection.send(JSON.stringify({type: 'newPlayer', name: playerName}));
-            };
-
-            connection.onerror = function(error) {
-                console.error("WebSocket error observed:", error);
-            };
-
-            connection.onclose = function() {
-                console.log("Connection closed.");
-            };
-
-            // Redirect to lobby after establishing connection
-            setTimeout(function() { 
-                window.location.href = "Lobby.html"; 
-            }, 1000); // Redirect after 1 second
+            //console.log('Player names:', playerNames);
+            socket.send(JSON.stringify({ type: 'newPlayer', playerName: playerName }));
+            // Redirect to lobby page
+            window.location.href = "Lobby.html";
         });
     </script>
 </body>
