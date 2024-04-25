@@ -3,6 +3,7 @@ package uta.cse3310;
 public class Player {
     private String name;
     private int score;
+    private PlayerType playerType;
 
     public Player(String name) {
         this.name = name;
@@ -25,5 +26,13 @@ public class Player {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
+    }
+
+    public void setPlayerType(PlayerType playerType) {
+        this.playerType = playerType;
     }
 }
