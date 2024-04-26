@@ -1,38 +1,34 @@
 package uta.cse3310;
 
 public class Player {
-    private String name;
-    private int score;
-    private PlayerType playerType;
+    
+    private int connectionID;
+    private String PlayerName;
+    private int PlayerPoints;
+    private String PlayerColor;
 
-    public Player(String name) {
-        this.name = name;
-        this.score = 0;
+    //Constructor
+    public Player(int connectionID, String PlayerName, int PlayerPoints, String PlayerColor){
+        this.connectionID = connectionID;
+        this.PlayerName = PlayerName;
+        this.PlayerPoints = PlayerPoints;
+        this.PlayerColor = PlayerColor;
     }
 
-    // Getter and setter methods for name and score
+    //Getter for player name
+    public String getName(){
 
-    public String getName() {
-        return name;
+        return "players name";
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    //Getter for player points
+    public int getPoints(){
 
-    public int getScore() {
-        return score;
+        return 1;
     }
+    //Getter for player color
+    public String getColor(){
 
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public PlayerType getPlayerType() {
-        return playerType;
-    }
-
-    public void setPlayerType(PlayerType playerType) {
-        this.playerType = playerType;
+        return "player color";
     }
 }

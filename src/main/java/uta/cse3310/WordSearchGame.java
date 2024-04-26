@@ -1,34 +1,17 @@
 package uta.cse3310;
-import java.util.ArrayList;
 
 public class WordSearchGame{
-    public PlayerType Players;
-    public Bank listOfWords; //all words in grid
-    public ArrayList<String> wordsToFind = new ArrayList<String>(); //list of words that are left to find
-    public String word = ""; //the word user has formed by clicking
-    public String[] Msg;
-    public Statistics S; 
-    public int numOfWords;
+    public PlayerType players;
 
-    public WordSearchGame(Statistics sta){
-        S = sta;
-        Msg = new String[2];
-        //S.GamesInProgress++; 
-        Players = PlayerType.XPLAYER;
-        numOfWords = wordsToFind.size();
-        Msg[0] = "Waiting for other player to join";
-        Msg[1] = "";
-    }
 
-    public int PlayerToIdx(PlayerType P) {
-        int retval = 0;
-        if (P == PlayerType.XPLAYER) {
-            retval = 0;
-        } else {
-            retval = 1;
-        }
-        return retval;
+    WordSearchGame(){
+
     }
+    
+    public void hint(){
+
+    }
+<<<<<<< HEAD
     public void wordfound(UserEvent U){
         //if word user formed are in the words left to find\
         if (U.PlayerIdx == PlayerType.OPLAYER) {
@@ -54,6 +37,20 @@ public class WordSearchGame{
             Msg[0] = "Game Over!";
             Msg[1] = "Game Over!";
         }
+=======
+
+    public void wordfound(){
+
+    }
+
+    public void hintTimer(){
+
+    }
+
+    public void clickOperation(){
+        
+    }
+>>>>>>> 7803fc1f1cc3ca512bb4b01f39e435109f14d5f1
 
     
 
