@@ -5,10 +5,9 @@ public class Game {
     PlayerType Players;
     public PlayerType CurrentTurn;
     public PlayerType[] Button;
-    // Buttons are indexed 0 to 8 in the code
-    // 0 1 2
-    // 3 4 5
-    // 6 7 8
+    
+    public Grid grid;
+    
 
     public String[] Msg;
     public int GameId;
@@ -17,6 +16,9 @@ public class Game {
     Game(Statistics s) {
         Stats = s;
         Button = new PlayerType[9];
+        
+        grid = new Grid();
+        
         // initialize it
         ResetBoard();
 
@@ -25,8 +27,10 @@ public class Game {
         // Shown to the user, 0 is XPLAYER
         // 1 is OPLAYER
         Msg = new String[2];
-        Msg[0] = "Waiting for other player to join";
-        Msg[1] = "";
+        //Msg[0] = "Waiting for other player to join";
+        //Msg[1] = "";
+        Msg[0] = "THE WORD SEARCH GAME";
+        Msg[1] = "THE WORD SEARCH GAME";
     }
 
     public void ResetBoard() {
