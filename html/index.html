@@ -68,31 +68,31 @@
 
         socket.onopen = function() {
             console.log('Connected to server');
-            let playerNames; // = sessionStorage.getItem('playerNames');
-            playerNames = playerNames ? JSON.parse(playerNames) : [];
+            //let playerNames; // = sessionStorage.getItem('playerNames');
+            //playerNames = playerNames ? JSON.parse(playerNames) : [];
 
-            const playerName = "";//sessionStorage.getItem('playerName');
-            if (playerName) {
-                socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-                console.log("sending " + JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-                displayNick(playerName, playerNames);
+            //const playerName = "";//sessionStorage.getItem('playerName');
+            //if (playerName) {
+            //    socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+            //    console.log("sending " + JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+            //    displayNick(playerName, playerNames);
 
                 // Store the updated list of player names back to sessionStorage
                 //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-            }
+            //}
         };
         
 
         document.getElementById('nameForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const playerName = document.getElementById("playerName").value; 
-            playerNames.push(playerName);
+            //playerNames.push(playerName);
             //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
             //sessionStorage.setItem('playerName', playerName);
             //console.log('Player names:', playerNames);
-            socket.send(JSON.stringify({ type: 'newPlayer', playerName: playerName }));
-            console.log("sending " + JSON.stringify({ type: 'newPlayer', playerName: playerName }));
-            Lobby_display();
+            socket.send(JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
+            console.log("sending " + JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
+            //Lobby_display();
         });
 
 
@@ -135,14 +135,18 @@
             }
         
     
+        ConnectionID=-1;
 
         socket.onmessage = function(event) {
             console.log('Message from server: ', event.data);
             const message = JSON.parse(event.data);
-            
-            if (message.sender && message.content) {
-                displayMessage(`${message.sender}: ${message.content}`, "user-message");
-            }
+           
+            if ('Type' in message) {
+                if (message.Type == "ID" ) {
+                   ConnectionID = message.ConnectionID;
+                   console.log("my connection id is " + ConnectionID);
+                }
+            } 
     
         };
 

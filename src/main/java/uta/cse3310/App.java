@@ -150,30 +150,32 @@ public class App extends WebSocketServer {
     }
   
 
-
   @Override
   public void onMessage(WebSocket conn, String message) {
     System.out.println("Received message from client: " + message);
 
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
-    Message receivedMessage = gson.fromJson(message, Message.class);
 
 
+    // each kind of message is processed here
+    if (message.indexOf("newPlayer")>0) {
 
-   // something should go here.
+           // this is of type 
+           //Received message from client: {"Type":"newPlayer","playerName":"aaaa","ConnectioID":1}
+           NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
+           System.out.println("the name is " + N.playerName + " "+ N.ConnectionID);
 
-
-
+     } 
 
 
     // Construct the broadcast message
-    String sender = receivedMessage.getSender();
-    String content = receivedMessage.getContent();
-    Message broadcastMessage = new Message(sender, content);
-    String jsonMessage = gson.toJson(broadcastMessage);
-    System.out.println("broadcast " + jsonMessage);
-    broadcast(jsonMessage);
+    //String sender = receivedMessage.getSender();
+    //String content = receivedMessage.getContent();
+    //Message broadcastMessage = new Message(sender, content);
+    //String jsonMessage = gson.toJson(broadcastMessage);
+    ///System.out.println("broadcast " + jsonMessage);
+    //broadcast(jsonMessage);
     // Broadcast the message to all connected clients
     //for (WebSocket client : clients) {
     //    client.send(jsonMessage);
