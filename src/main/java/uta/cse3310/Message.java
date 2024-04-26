@@ -1,39 +1,31 @@
 package uta.cse3310;
 
-import java.util.List;
-
 public class Message {
-    public String type;
-    public String message;
-    public char[][] grid;
-    public List<String> WordsUsed;
-    public int FoundWordIndex;
+    private String sender;
+    private String content;
 
-    //Basic Message
-    public Message(String message){
-        this.type = "message";
-        this.message = message;
-    }
-    
-
-    //Grid Message
-    public Message(char[][] grid){
-        this.type = "Grid";
-        this.grid = grid;
+    public Message() {
+        // Default constructor
     }
 
-    //Word Bank Message
-    public Message(List<String> WordsUsed){
-        this.type = "WordBank";
-        this.WordsUsed = WordsUsed;
+    public Message(String sender, String content) {
+        this.sender = sender;
+        this.content = content;
     }
 
-    //Found Word
-    public Message(int FoundWordIndex){
-        this.type = "FoundWord";
-        this.FoundWordIndex = FoundWordIndex;
-
+    public String getSender() {
+        return sender;
     }
 
-    
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
