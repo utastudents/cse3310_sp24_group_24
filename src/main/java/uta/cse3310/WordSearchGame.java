@@ -1,17 +1,26 @@
 package uta.cse3310;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class WordSearchGame{
     public PlayerType players;
+    public Statistics S;
+    public List<String> wordsToFind;
+    public String word;
+    public int numOfWords;
+    public String[] Msg;
 
+    WordSearchGame(Statistics sta){
+        S = sta;
+        S.GamesInProgress++;
 
-    WordSearchGame(){
+        Msg =  new String[2];
+        Msg[0] = "Welcome to Word Search Game";
+        Msg[1] = "";
 
     }
-    
-    public void hint(){
-
-    }
-<<<<<<< HEAD
+    //get words from bank & compare the string to all words
     public void wordfound(UserEvent U){
         //if word user formed are in the words left to find\
         if (U.PlayerIdx == PlayerType.OPLAYER) {
@@ -21,6 +30,7 @@ public class WordSearchGame{
                 Msg[0] = numOfWords + "words left to find!";
                 Msg[1] = numOfWords + "words left to find!";
                 //update score
+                S.OWins++;
             }
         } else {
             if(wordsToFind.contains(word)){
@@ -29,6 +39,7 @@ public class WordSearchGame{
                 Msg[0] = numOfWords + "words left to find!";
                 Msg[1] = numOfWords + "words left to find!";
                 //update score
+                S.XWins++;
             }
         }
         //if no more words left to find
@@ -37,22 +48,6 @@ public class WordSearchGame{
             Msg[0] = "Game Over!";
             Msg[1] = "Game Over!";
         }
-=======
-
-    public void wordfound(){
-
-    }
-
-    public void hintTimer(){
-
-    }
-
-    public void clickOperation(){
-        
-    }
->>>>>>> 7803fc1f1cc3ca512bb4b01f39e435109f14d5f1
-
-    
 
     }
 }
