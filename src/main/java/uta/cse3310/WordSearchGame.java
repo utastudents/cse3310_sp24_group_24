@@ -29,13 +29,22 @@ public class WordSearchGame{
         }
         return retval;
     }
-    public void wordfound(){
-        //if word user formed are in the words left to find
-        if(wordsToFind.contains(word)){
-            wordsToFind.remove(word); //if found remove word from words to find
-            numOfWords--;
-            Msg[0] = numOfWords + "words left to find!";
-            Msg[1] = numOfWords + "words left to find!";
+    public void wordfound(UserEvent U){
+        //if word user formed are in the words left to find\
+        if (U.PlayerIdx == PlayerType.OPLAYER) {
+            if(wordsToFind.contains(word)){
+                wordsToFind.remove(word); //if found remove word from words to find
+                numOfWords--;
+                Msg[0] = numOfWords + "words left to find!";
+                Msg[1] = numOfWords + "words left to find!";
+            }
+        } else {
+            if(wordsToFind.contains(word)){
+                wordsToFind.remove(word); //if found remove word from words to find
+                numOfWords--;
+                Msg[0] = numOfWords + "words left to find!";
+                Msg[1] = numOfWords + "words left to find!";
+            }
         }
         //if no more words left to find
         if(wordsToFind.size() == 0){
@@ -43,6 +52,8 @@ public class WordSearchGame{
             Msg[0] = "Game Over!";
             Msg[1] = "Game Over!";
         }
-    }
 
+    
+
+    }
 }
