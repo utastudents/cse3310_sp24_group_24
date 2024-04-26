@@ -37,6 +37,7 @@ public class WordSearchGame{
                 numOfWords--;
                 Msg[0] = numOfWords + "words left to find!";
                 Msg[1] = numOfWords + "words left to find!";
+                //update score
             }
         } else {
             if(wordsToFind.contains(word)){
@@ -44,6 +45,7 @@ public class WordSearchGame{
                 numOfWords--;
                 Msg[0] = numOfWords + "words left to find!";
                 Msg[1] = numOfWords + "words left to find!";
+                //update score
             }
         }
         //if no more words left to find
