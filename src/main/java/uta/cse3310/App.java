@@ -174,25 +174,58 @@ public class App extends WebSocketServer {
 
   @Override
   public void onMessage(WebSocket conn, String message) {
+
+    Game G = conn.getAttachment();
+    Gson gson = new Gson();
+
     System.out.println("< " + Duration.between(startTime, Instant.now()).toMillis() + " " + "-" + " " + escape(message));
     
+    //Checking if the incoming message is of player info then making a new player
     if(message.startsWith("PlayerInfo,") == true){
       StringTokenizer string = new StringTokenizer(message,",");
       string.nextToken();
       AllPlayers.add(new Player(connectionId, string.nextToken(), 0, string.nextToken()));
     }
 
+    //Checking if the incoming message is to check a word, if test passes send to server and cross out correct word
+    if(message.startsWith("WordCheck") == true)
+    {
+      int j = 0;
+      Boolean Found = false;
+      StringTokenizer string = new StringTokenizer(message," ");
+      string.nextToken(); 
+      String test = string.nextToken();
+      for (String i : G.grid.WordsUsedLocations)
+      {
+        if(test.equals(i)){
+          System.out.println("ITS ACTUALLY A WORD!");
+          Message FoundWord = new Message(j);
+          String FoundWordJSONString = gson.toJson(FoundWord);
+          conn.send(FoundWordJSONString);
+          Found = true;
+          break;
+        }
+        j++;
+      }
+      if(Found == false){
+        Message FoundWord = new Message(-1);
+        String FoundWordJSONString = gson.toJson(FoundWord);
+        conn.send(FoundWordJSONString);
+      }
+
+    }
+
     // Bring in the data from the webpage
     // A UserEvent is all that is allowed at this point
     GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
+    gson = builder.create();
     //UserEvent U = gson.fromJson(message, UserEvent.class);
 
     // Update the running time
     stats.setRunningTime(Duration.between(startTime, Instant.now()).toSeconds());
 
     // Get our Game Object
-    Game G = conn.getAttachment();
+    //Game G = conn.getAttachment();
     //G.Update(U);
 
     // send out the game state every time

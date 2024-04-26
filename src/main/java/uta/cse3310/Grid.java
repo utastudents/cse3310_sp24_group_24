@@ -12,7 +12,7 @@ import java.io.FileReader;
 
 public class Grid {
 
-    public final int GridSize = 40;
+    public final int GridSize = 20;
     public final int GridArea = GridSize * GridSize;
     public final double TargetDensity = .67;
     public final int MaxWordCount = 275;
@@ -20,6 +20,7 @@ public class Grid {
     public char[][] WordSearchGrid;
     public List<String> SolutionArray;
     public List<String> WordsUsed;
+    public List<String> WordsUsedLocations;
     public List<String> WordList;
     static final Random random = new Random();
     public double GridDensity;
@@ -33,6 +34,7 @@ public class Grid {
         WordSearchGrid = new char[GridSize][GridSize];
         SolutionArray = new ArrayList<>();
         WordsUsed = new ArrayList<>();
+        WordsUsedLocations = new ArrayList<>();
         
 
         //Call function to read in words
@@ -162,8 +164,10 @@ public class Grid {
         int lettersPlaced = length - overlaps;
 
         if (lettersPlaced > 0)
-            SolutionArray.add(String.format("%-10s (%d, %d)(%d,%d)", word, c, r, cc, rr));
+            SolutionArray.add(String.format("%-10s (%d,%d) (%d,%d)", word, c, r, cc, rr));
             WordsUsed.add(word);
+            WordsUsedLocations.add(String.format("(%d,%d)(%d,%d)", c, r, cc, rr));
+
 
         return lettersPlaced;
     }
