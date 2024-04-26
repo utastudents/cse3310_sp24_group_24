@@ -24,10 +24,10 @@ public class Lobby {
 
         // Assign player type
         if (gameController == PlayerType.NOPLAYER) {
-            player.setPlayerType(PlayerType.XPLAYER); // First player becomes X
+            //player.setPlayerType(PlayerType.XPLAYER); // First player becomes X
             setGameController(player);
         } else {
-            player.setPlayerType(PlayerType.OPLAYER); // Others become O
+            //player.setPlayerType(PlayerType.OPLAYER); // Others become O
         }
 
         players.add(player);
@@ -35,10 +35,10 @@ public class Lobby {
 
     public synchronized void removePlayer(Player player) {
         players.remove(player);
-        if (gameController.equals(player.getPlayerType())) {
+        //if (gameController.equals(player.getPlayerType())) {
             // If the player being removed is the game controller, assign control to the next player
-            gameController = getNextGameController();
-        }
+        //    gameController = getNextGameController();
+        //}
     }
 
     public synchronized Player getPlayerByName(String playerName) {
@@ -77,24 +77,25 @@ public class Lobby {
     }
 
     private synchronized void setGameController(Player player) {
-        gameController = player.getPlayerType();
+        //gameController = player.getPlayerType();
     }
 
     private synchronized PlayerType getNextGameController() {
-        for (Player player : players) {
-            if (player.getPlayerType() != gameController) {
-                return player.getPlayerType();
-            }
-        }
-        return PlayerType.NOPLAYER; // If no player remains, set game controller to NOPLAYER
+        //for (Player player : players) {
+            //if (player.getPlayerType() != gameController) {
+            //    return player.getPlayerType();
+        //    }
+        //}
+        //return PlayerType.NOPLAYER; // If no player remains, set game controller to NOPLAYER
+        return null;
     }
 
     private synchronized boolean isGameControllerReady() {
-        for (Player player : players) {
-            if (player.getPlayerType() == gameController && !readyQueue.contains(player)) {
-                return false; // Game controller is not ready
-            }
-        }
+        //for (Player player : players) {
+            //if (player.getPlayerType() == gameController && !readyQueue.contains(player)) {
+            //    return false; // Game controller is not ready
+            //}
+        //}
         return true; // Game controller is ready
     }
 
