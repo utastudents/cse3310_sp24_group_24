@@ -118,8 +118,8 @@ public class App extends WebSocketServer {
 
     //Lobby lobby = findAvailableLobby();
     //if (lobby == null) {
-    //  lobby = createNewLobby();
-    //}
+     // lobby = createNewLobby();
+   // }
     //lobby.addPlayer(new Player(playerName)); // Add player to the lobby
 
     // Set the lobby as an attachment to the connection
@@ -157,30 +157,91 @@ public class App extends WebSocketServer {
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
 
+    //broadcast the recieved message
+   // broadcast(message);
+   //Player newPlayer = new Player(playerName);
+
+    
+     // Add player to the lobby
+
+    // Set the lobby as anttachment to the connection
+    //conn.setAttachment(lobby);
+
+    // Send lobby information to the connected client
+    // Gson gson = new Gson();
+    //String jsonString = gson.toJson(lobby);
+    //conn.send(jsonString);
+    //System.out.println("Sending "+jsonString);
+
+    // Broadcast lobby information to all clients
+    //broadcast(gson.toJson(lobby));
+    
+      NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
+      Lobby lobbys = conn.getAttachment();
+      Lobby lobby = findAvailableLobby();
+      if (lobby == null) {
+        lobby = createNewLobby();
+        }
+        lobby.addPlayer(new Player(N.ConnectionID, N.playerName, 0, ""));
+
+      Message mO = gson.fromJson(message, Message.class);
+      if("chatbox".equals(mO.getContent()));
+      {
+        //String chatMessage = gson.toJson(new Message(N.playerName, mO.getContent()));
+        //broadcast(chatMessage);
+        broadcast(message);
+      }
+
+    if (message.contains("content")) {
+      // Use JSON parsing to extract sender and content
+
+      //Message messageObject = gson.fromJson(message, Message.class);
+      
+      // Create the chat string
+      //String chatstring = message.sender + ": " + message.content;
+      
+      // Broadcast the chat string
+      //broadcast(message);
+
+  }
+  
+
+
 
     // each kind of message is processed here
     if (message.indexOf("newPlayer")>0) {
 
            // this is of type 
            //Received message from client: {"Type":"newPlayer","playerName":"aaaa","ConnectioID":1}
-           NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
+           //NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
            System.out.println("the name is " + N.playerName + " "+ N.ConnectionID);
+           //new code added//
+           //Player playername = new Player(N.ConnectionID, N.playerName, 0, ""); 
+          // Checking to see if players names are being added to the list
+           Player.printPlayerList();
 
-     } 
+
+        }
+     
+    }
+  
 
 
     // Construct the broadcast message
-    //String sender = receivedMessage.getSender();
-    //String content = receivedMessage.getContent();
-    //Message broadcastMessage = new Message(sender, content);
-    //String jsonMessage = gson.toJson(broadcastMessage);
-    ///System.out.println("broadcast " + jsonMessage);
-    //broadcast(jsonMessage);
+    //String sender = message.getSender();
+    //String content = message.getContent();
+    
     // Broadcast the message to all connected clients
-    //for (WebSocket client : clients) {
-    //    client.send(jsonMessage);
-    //    }
-   }
+   /*  public void broadcast(String message)
+    {
+     //Message broadcastMessage = new Message(message.sender, message.content);
+    //String jsonMessage = gson.toJson(broadcastMessage);
+    //System.out.println("broadcast " + jsonMessage);
+    //broadcast(jsonMessage);
+    for (WebSocket client : clients) {
+        client.send(message);
+       }
+   } */
 
 
 

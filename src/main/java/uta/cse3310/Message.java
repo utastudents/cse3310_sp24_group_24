@@ -6,10 +6,12 @@ public class Message {
 
     public Message() {
         // Default constructor
+        String content;
     }
 
-    public Message(String sender, String content) {
-        this.sender = sender;
+    public Message(Player sender, String content) {
+        
+        this.sender = sender.getName();
         this.content = content;
     }
 

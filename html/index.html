@@ -60,6 +60,7 @@
     </div>
     
     
+    
     <script>
         // Establish WebSocket connection when the page loads
         var serverUrl = 'ws://' + window.location.hostname + ':9124';
@@ -68,6 +69,8 @@
 
         socket.onopen = function() {
             console.log('Connected to server');
+            const lobbyPage = document.querySelector(".lobby-page");
+            lobbyPage.style.display = "none";
             //let playerNames; // = sessionStorage.getItem('playerNames');
             //playerNames = playerNames ? JSON.parse(playerNames) : [];
 
@@ -86,6 +89,17 @@
         document.getElementById('nameForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const playerName = document.getElementById("playerName").value; 
+            if (playerName.trim() !== "")
+            {
+                var allPlayersnames = document.querySelector("#playerNick");
+                for (var i = 0; i < allPlayersnames.length; i++)
+                {
+                    alert("Name already in use. Try again");
+                    return;
+                }
+            }
+            Lobby_display();
+
             //playerNames.push(playerName);
             //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
             //sessionStorage.setItem('playerName', playerName);
@@ -94,6 +108,7 @@
             console.log("sending " + JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
             //Lobby_display();
         });
+      
 
 
         
@@ -101,9 +116,9 @@
             const landingPage = document.querySelector(".landing-page");
             const lobbyPage = document.querySelector(".lobby-page");
             landingPage.style.display = "none";
-            lobbyPage.style.display = "flex";
+            lobbyPage.style.display = "block";
 
-            const playerName = ""; //sessionStorage.getItem('playerName');
+            //const playerName = ""; //sessionStorage.getItem('playerName');
             if (playerName) {
             // Display the player name in the lobby
             displayNick(playerName, playerNames);
@@ -147,6 +162,10 @@
                    console.log("my connection id is " + ConnectionID);
                 }
             } 
+            if ('sender' in message)
+            {
+                displayMessage(message.sender, message.content);
+            }
     
         };
 
@@ -162,7 +181,7 @@
         function sendMessage() {
             const userInput = document.getElementById("userInput");
             const content = userInput.value.trim();
-            const playerName = ""; //sessionStorage.getItem('playerName') || 'Anonymous';
+            const playerName = document.getElementById("playerName").value.trim(); //sessionStorage.getItem('playerName') || 'Anonymous';
             if (content) {
                 const message = { sender: playerName, content: content };
                 socket.send(JSON.stringify(message));

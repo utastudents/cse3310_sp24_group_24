@@ -23,7 +23,7 @@ public class Player {
     //Getter for player name
     public String getName(){
 
-        return "players name";
+        return PlayerName;
     }
 
     //Getter for player points
@@ -41,4 +41,12 @@ public class Player {
     public static List<String> getPlayerList() {
         return playerList;
     }
+
+    public static void printPlayerList() {
+        System.out.println("List of players:");
+        for (String PlayerName : playerList) {
+            System.out.println(PlayerName);}
+        }
+
+
 }
