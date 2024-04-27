@@ -182,17 +182,23 @@ public class App extends WebSocketServer {
       if (lobby == null) {
         lobby = createNewLobby();
         }
-        lobby.addPlayer(new Player(N.ConnectionID, N.playerName, 0, ""));
+        Player player = new Player(N.ConnectionID, N.playerName, 0, "");
+        lobby.addPlayer(player);
 
       Message mO = gson.fromJson(message, Message.class);
-      if("chatbox".equals(mO.getContent()));
+      String sender = mO.getSender();
+      String content = mO.getContent();
+      System.out.println(sender + " : " + content);
+      if("playerNick".equals(mO.getContent()));
       {
-        //String chatMessage = gson.toJson(new Message(N.playerName, mO.getContent()));
-        //broadcast(chatMessage);
-        broadcast(message);
+        String chatMessage = sender +  ":" + content; //gson.toJson(new Message(player, mO.getContent()));
+        String jsonMessage = gson.toJson(new Message(player, content));
+        broadcast(jsonMessage);
+        //broadcast(message);
+  
       }
 
-    if (message.contains("content")) {
+    //if (message.contains("content")) {
       // Use JSON parsing to extract sender and content
 
       //Message messageObject = gson.fromJson(message, Message.class);
@@ -203,7 +209,7 @@ public class App extends WebSocketServer {
       // Broadcast the chat string
       //broadcast(message);
 
-  }
+  //}
   
 
 
@@ -219,11 +225,18 @@ public class App extends WebSocketServer {
            //Player playername = new Player(N.ConnectionID, N.playerName, 0, ""); 
           // Checking to see if players names are being added to the list
            Player.printPlayerList();
+           //broadcastPlayerList();
 
 
         }
      
     }
+   /*  private void broadcastPlayerList() {
+      List<String> playerNames = Player.getPlayerList();
+      Gson gson = new Gson();
+      String jsonPlayerList = gson.toJson(playerNames);
+      broadcast(jsonPlayerList); // Send the player list to all connected clients
+  }*/
   
 
 
