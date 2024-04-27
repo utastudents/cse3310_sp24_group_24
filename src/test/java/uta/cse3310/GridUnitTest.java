@@ -8,18 +8,11 @@ import java.util.*;
 
 public class GridUnitTest extends TestCase {
 
-    public final int GridSize = 10;
+    public final int GridSize = 20;
     public final int GridArea = GridSize * GridSize;
     public final double TargetDensity = .67;
     public final int MaxWordCount = 275;
     public final int MinWordCount = 10;
-    // public char[][] WordSearchGrid;
-    // public List<String> SolutionArray;
-    // public List<String> WordsUsed;
-    // public List<String> WordsUsedLocations;
-    // public List<String> WordList;
-    // static final Random random = new Random();
-    // public double GridDensity;
 
     /**
      * Create the test case
@@ -37,51 +30,7 @@ public class GridUnitTest extends TestCase {
         return new TestSuite(GridUnitTest.class);
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
-
-    // Extensive test to test a set of words fitting onto the grid in a particular way
-    public void testtryLocation() {
-        // Initialize Variables
-        final List<String> WordList;
-        WordList = new ArrayList<>();
-        final char[][] WordSearchGrid;
-        WordSearchGrid = new char[GridSize][GridSize];
-
-        // Create Grid object
-        Grid testGrid = new Grid();
-
-        // Code from the CreatWordSeachGrid
-        int MinCellsUsed = (int) (GridArea * TargetDensity);
-        System.out.println("GridArea = " + GridArea);
-        System.out.println("TargetDensity = " + TargetDensity);
-        System.out.println("MinCellsUsed= " + MinCellsUsed);
-        int CellsUsed = 0;
-
-        /**
-         * WordList - Size Of Word
-         * ===========================
-         * expressions - [Does Not Fit]
-         * exercises - 9 characters
-         * beautiful - 9 characters
-         * resumes - 7 characters
-         * familiar - 8 characters
-         * useful - 6 characters
-         * linked - 6 characters
-         * lyrics - 6 characters
-         * scout - 5 characters
-         * rest - 4 characters
-         * epic - 4 characters
-         * love - 4 characters
-         * ends - 4 characters
-         * dual - 4 characters
-         */
-
+    public void wordListSetup(List<String> WordList) {
         // Add words to word list individually
         WordList.add(("expressions").toUpperCase()); // index 0
         WordList.add(("exercises").toUpperCase()); // index 1
@@ -98,8 +47,124 @@ public class GridUnitTest extends TestCase {
         WordList.add(("ends").toUpperCase()); // index 12
         WordList.add(("dual").toUpperCase()); // index 13
 
-        // Unable to test if word is not inserted into grid for being out of bounds, due to different grid sizes
+        /**
+         * WordList - Size Of Word
+         * ==========================================
+         * expressions - 11 characters [Does Not Fit]
+         * exercises - 9 characters
+         * beautiful - 9 characters
+         * resumes - 7 characters
+         * familiar - 8 characters
+         * useful - 6 characters
+         * linked - 6 characters
+         * lyrics - 6 characters
+         * scout - 5 characters
+         * rest - 4 characters
+         * epic - 4 characters
+         * love - 4 characters
+         * ends - 4 characters
+         * dual - 4 characters
+         */
+    }
+
+    // Simple test to see if a word can be inserted in all possible directions
+    // (testing with 20x20 grid)
+    public void testtryAllDirections() {
+        final List<String> WordList;
+        WordList = new ArrayList<>();
+        final char[][] WordSearchGrid;
+        WordSearchGrid = new char[GridSize][GridSize];
         int expectedCellsUsed = 0;
+
+        // Add words to word list
+        wordListSetup(WordList);
+
+        // Create Grid object
+        Grid testGrid = new Grid();
+
+        // Code from the CreatWordSeachGrid function
+        int MinCellsUsed = (int) (GridArea * TargetDensity);
+        System.out.println("\nTesting all directions...\nGridArea = " + GridArea);
+        System.out.println("TargetDensity = " + TargetDensity);
+        System.out.println("MinCellsUsed= " + MinCellsUsed);
+        int CellsUsed = 0;
+
+        // Testing horizontal right (dir = 0)
+        // Should NOT fit into 20x20 grid at r = 10, c = 10
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 0, 10, 10);
+        expectedCellsUsed = 0;
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing diagonal up right (dir = 3)
+        // Should NOT fit into 20x20 grid at r = 10, c = 10
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 3, 10, 10);
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing vertical up (dir = 5)
+        // Should fit into 20x20 grid
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 5, 10, 10);
+        expectedCellsUsed = 11;
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing diagonal up left (dir = 6)
+        // Should fit into 20x20 grid
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 6, 10, 10);
+        expectedCellsUsed = 21;
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing horizontal left (dir = 4)
+        // Should fit into 20x20 grid
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 4, 10, 10);
+        expectedCellsUsed = 31;
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing diagonal up right (dir = 7)
+        // Should NOT fit into 20x20 grid at r = 10, c = 10
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 7, 10, 10);
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing vertical down (dir = 1)
+        // Should NOT fit into 20x20 grid at r = 10, c = 10
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 1, 10, 10);
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Testing diagonal down right (dir = 2)
+        // Should NOT fit into 20x20 grid at r = 10, c = 10
+        CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 2, 10, 10);
+        assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Unable to print resulting grid due to global variables in Grid.java
+
+        System.out.println("Finished testing all directions...\n");
+    }
+
+    // Extensive test to test a set of words fitting onto the grid in a particular
+    // way
+    public void testtryLocation() {
+        // Initialize Variables
+        final List<String> WordList;
+        WordList = new ArrayList<>();
+        final char[][] WordSearchGrid;
+        final int GridSize = 10;
+        final int GridArea = GridSize * GridSize;
+        WordSearchGrid = new char[GridSize][GridSize];
+        int expectedCellsUsed = 0;
+
+        // Add words to word list
+        wordListSetup(WordList);
+
+        // Create Grid object
+        Grid testGrid = new Grid();
+
+        // Code from the CreatWordSeachGrid function
+        int MinCellsUsed = (int) (GridArea * TargetDensity);
+        System.out.println("\nTesting 10x10 Grid...\nGridArea = " + GridArea);
+        System.out.println("TargetDensity = " + TargetDensity);
+        System.out.println("MinCellsUsed= " + MinCellsUsed);
+        int CellsUsed = 0;
+
+        // Unable to test if word is not inserted into grid for being out of bounds, due
+        // to overriding variables in Grid.java
 
         /**
          * Adding "exercises"
@@ -321,5 +386,18 @@ public class GridUnitTest extends TestCase {
         CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(13), 5, 8, 7);
         expectedCellsUsed = 69;
         assertEquals(expectedCellsUsed, CellsUsed);
+
+        // Check if it meets the minimum number of cells
+        assertTrue(CellsUsed > MinCellsUsed);
+
+        // Unable to print resulting grid due to global variables in Grid.java
+
+        System.out.println("Finished testing tryLocations...\n");
+
     }
+
+    // Most other functions outside of tryLocation be either trivial, has randomness
+    // built into the function, or is untestable due to global variables in
+    // Grid.java.
+
 }
