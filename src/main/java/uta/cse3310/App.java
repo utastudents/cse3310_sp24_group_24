@@ -64,6 +64,9 @@ import java.time.Duration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 
 public class App extends WebSocketServer {
 
@@ -109,6 +112,8 @@ public class App extends WebSocketServer {
     String jsonString = gson.toJson(E);
     conn.send (jsonString);
     System.out.println("sending "+jsonString);
+
+
 
     // delete me String playerName = handshake.getFieldValue("playerName");
 
@@ -191,9 +196,9 @@ public class App extends WebSocketServer {
       System.out.println(sender + " : " + content);
       if("playerNick".equals(mO.getContent()));
       {
-        String chatMessage = sender +  ":" + content; //gson.toJson(new Message(player, mO.getContent()));
+        String chatMessage = sender +  ":" + content;
         String jsonMessage = gson.toJson(new Message(player, content));
-        broadcast(jsonMessage);
+        broadcast(chatMessage);
         //broadcast(message);
   
       }
@@ -225,18 +230,27 @@ public class App extends WebSocketServer {
            //Player playername = new Player(N.ConnectionID, N.playerName, 0, ""); 
           // Checking to see if players names are being added to the list
            Player.printPlayerList();
-           //broadcastPlayerList();
+           broadcastPlayerList();
 
 
         }
      
     }
-   /*  private void broadcastPlayerList() {
+     private void broadcastPlayerList() {
       List<String> playerNames = Player.getPlayerList();
       Gson gson = new Gson();
       String jsonPlayerList = gson.toJson(playerNames);
-      broadcast(jsonPlayerList); // Send the player list to all connected clients
-  }*/
+      JsonObject broadcastMessage = new JsonObject();
+        broadcastMessage.addProperty("type", "playerList");
+        broadcastMessage.add("players", gson.toJsonTree(playerNames));
+
+        // Send the player list to all connected clients
+        for (WebSocket client : clients) {
+            client.send(broadcastMessage.toString());
+        }
+    }
+      //broadcast(jsonPlayerList); // Send the player list to all connected clients
+  
   
 
 

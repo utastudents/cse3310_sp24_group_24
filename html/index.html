@@ -49,7 +49,7 @@
                     <ol id="playerQueue" class="player-nick"></ol> <!-- Corrected ID -->
                 </div>
                 <div class="box">
-                    <h1 class="header_text">Waiting for Host</h1>
+                    <h1 class="header_text">Start Game With</h1>
                     <button id="startButton" onclick="startGame()"> Begin</button>
                 </div>
             </div>
@@ -98,6 +98,8 @@
                     return;
                 }
             }
+        
+
             Lobby_display();
 
             //playerNames.push(playerName);
@@ -162,12 +164,14 @@
                    console.log("my connection id is " + ConnectionID);
                 }
             } 
-            if ('sender' in message)
-            {
+            if (message.type === "sender") {
+                updatePlayerList(message.players); // Update the player list in the HTML
+          } else if ('sender' in message) {
                 displayMessage(message.sender, message.content);
-            }
+    }
+};
     
-        };
+        
 
         socket.onclose = function() {
             console.log('WebSocket connection closed');
@@ -217,6 +221,17 @@
     // Send the updated list of player names to the server
             socket.send(JSON.stringify({ playerNames: playerNames }));
         }
+        function updatePlayerList(players) {
+            const playerNick = document.getElementById('playerNick');
+            playerNick.innerHTML = ''; // Clear the existing player list
+
+            // Add each player to the player list in the HTML
+             players.forEach(player => {
+                const li = document.createElement('li');
+                li.textContent = player;
+                 playerNick.appendChild(li);
+                });
+            }
 
 
         function updateBeginButtonVisibility() {
