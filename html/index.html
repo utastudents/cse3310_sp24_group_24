@@ -99,7 +99,7 @@
                 }
             }
         
-
+            displayNick(playerName, playerNames);
             Lobby_display();
 
             //playerNames.push(playerName);
@@ -211,6 +211,9 @@
     // Create a new list item for the new player's name
             const li = document.createElement('li');
             li.textContent = playerName;
+    //font size
+            li.style.fontSize = "20px"; 
+
     // Append the new player's name to the list of player names displayed in the lobby
             playerNick.appendChild(li);
     // Add the new player's name to the list of player names
