@@ -256,7 +256,7 @@
                 alert("No players in the lobby yet!");
             }
         }
-
+        /*
         function readyqueue() {
             const playerNick = "";//sessionStorage.getItem('playerName');
             if (playerNick) {
@@ -272,6 +272,21 @@
                 console.error('Player name not found.');
             }
         }
+        */
+        function readyqueue() {
+            const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
+            if (playerName) {
+                const playerQueue = document.getElementById('playerQueue');
+                const li = document.createElement('li');
+                li.textContent = playerName; // Use the player's name obtained from the input field
+                li.style.fontSize = "20px"; 
+                playerQueue.appendChild(li);
+            } else {
+                console.error('Player name not found.');
+            }
+        }
+
+
 
         function view_leaderboard() {
             // window.location.href = 'Leaderboard.html';
