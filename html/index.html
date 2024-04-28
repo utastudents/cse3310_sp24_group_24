@@ -31,8 +31,11 @@
                 </div>
                 <div class="box">
                     <h1 class="header_text">Leaderboard</h1>
+                    
+                    <ol id="leaderboard" style="list-style-type:none;"></ol>
+
                     <div class="button-container">
-                        <button id="button" onclick="view_leaderboard()">Click to View</button>
+                        <button id="button" onclick="">Click to View</button>
                     </div>
                 </div>
             </div>
@@ -109,6 +112,15 @@
             socket.send(JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
             console.log("sending " + JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
             //Lobby_display();
+
+
+            if (playerName) {
+                // Auto 0 to the new player
+                const startScore = 0;
+                
+                // Add the player
+                updateLeaderboard(playerName, startScore);
+            }
         });
       
 
@@ -249,6 +261,8 @@
 
         function startGame() {
             const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
+            //transport to Lobby3
+            window.location.href = 'Lobby3.html';
             if (playerNickItems.length > 0) {
                 const firstPlayer = playerNickItems[0].textContent;
                 alert(firstPlayer + " has started the game!");
@@ -288,9 +302,40 @@
 
 
 
+        let leaderboardData = [];
+        function updateLeaderboard(playerName, score) {
+            // Check player is in leaderboard
+            const existPlayer = leaderboardData.findIndex(player => player.name === playerName);
+            
+            if (existPlayer !== -1) {
+                // Update score if they are already in  leaderboard
+                leaderboardData[existingPlayer].score = score;
+            } else {
+                // Add a new player
+                leaderboardData.push({ name: playerName, score: score });
+            }
+            
+            // Sort by score
+            leaderboardData.sort((a, b) => b.score - a.score);
+            
+            //update leaderboard
+            view_leaderboard();
+        }
+
         function view_leaderboard() {
             // window.location.href = 'Leaderboard.html';
             // causes the page to be loaded
+            const leaderboardElement = document.getElementById('leaderboard');
+    
+            // Clear leaderboard content
+            leaderboardElement.innerHTML = '';
+            
+            // Loop through the leaderboard per player
+            leaderboardData.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${player.name}: ${player.score}`;
+                leaderboardElement.appendChild(li);
+            });
         }
 
     </script>
