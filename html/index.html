@@ -98,14 +98,9 @@
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
-<<<<<<< HEAD
-=======
             const gamePage = document.querySelector(".game-page");
             gamePage.style.display = "none";
-            //let playerNames; // = sessionStorage.getItem('playerNames');
-            //playerNames = playerNames ? JSON.parse(playerNames) : [];
->>>>>>> 8e9b9bb4200cb31e2559e80f8698af8c506fd75f
-
+            
             let storedPlayerNames = localStorage.getItem('playerNames');
             playerNames = storedPlayerNames ? JSON.parse(storedPlayerNames) : [];
 
@@ -392,7 +387,6 @@
                 li.textContent = `${index + 1}. ${player.name}: ${player.score}`;
                 leaderboardElement.appendChild(li);
             });
-<<<<<<< HEAD
         }
 
         function generateTable(arrayData) {
@@ -444,8 +438,6 @@
             cIndexOne = x.cellIndex;
         }else{
             cIndexTwo = x.cellIndex;
-=======
->>>>>>> 8e9b9bb4200cb31e2559e80f8698af8c506fd75f
         }
     }
 
