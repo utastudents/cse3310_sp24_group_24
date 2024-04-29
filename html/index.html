@@ -95,7 +95,7 @@
         var socket = new WebSocket(serverUrl);
         var playerNames = [];
 
-        socket.onopen = function() {
+        socket.onopen = function(evt) {
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
@@ -194,21 +194,21 @@
         ConnectionID=-1;
 
         socket.onmessage = function(event) {
-            console.log('Message from server: ', event.data);
+            console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
            
-            switch(msg.type){
+            switch(message.type){
             case 'Grid':
                 console.log("Grid recieved");
-                displayWordSearch(msg.grid);
+                displayWordSearch(message.grid);
                 break;
             case 'WordBank':
                 console.log("WordBank recieved");
-                displayWordBank(msg.WordsUsed);
+                displayWordBank(message.WordsUsed);
                 break;  
             case 'FoundWord':
                 console.log("FoundWord recieved");
-                crossOutWord(msg.FoundWordIndex)
+                crossOutWord(message.FoundWordIndex)
                 break;   
             default:
                 console.log("Unkown message")
