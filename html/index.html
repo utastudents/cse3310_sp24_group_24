@@ -98,6 +98,13 @@
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
+<<<<<<< HEAD
+=======
+            const gamePage = document.querySelector(".game-page");
+            gamePage.style.display = "none";
+            //let playerNames; // = sessionStorage.getItem('playerNames');
+            //playerNames = playerNames ? JSON.parse(playerNames) : [];
+>>>>>>> 8e9b9bb4200cb31e2559e80f8698af8c506fd75f
 
             let storedPlayerNames = localStorage.getItem('playerNames');
             playerNames = storedPlayerNames ? JSON.parse(storedPlayerNames) : [];
@@ -385,7 +392,130 @@
                 li.textContent = `${index + 1}. ${player.name}: ${player.score}`;
                 leaderboardElement.appendChild(li);
             });
+<<<<<<< HEAD
         }
+
+        function generateTable(arrayData) {
+        var table = '<table border="1" id="WordGrid" >';
+            for (var i = 0; i < arrayData.length; i++) {
+                table += '<tr onclick="clickFunctionRow(this)">';
+                for (var j = 0; j < arrayData[i].length; j++) {
+                    //table += '<td>' + arrayData[i][j] + '</td>';
+                    table += '<td onclick="clickFunctionCol(this)">' + arrayData[i][j] + '</td>';
+                }
+                table += '</tr>';
+            }
+        table += '</table>';
+        return table;
+    }
+
+    //Generates the list of words for the word bank
+    function generateWordBank(arrayData) {
+        var table = '<ul id=WordBank>';
+            for (var i = 0; i < arrayData.length; i++) {
+                table += '<li>' + arrayData[i] + '</li>'
+            }
+        table += '</ul>';
+        return table;
+    }
+
+    //Puts the generated table into the container for word search
+    function displayWordSearch(arrayData) {
+        var container = document.getElementById('table-container');
+        container.innerHTML = generateTable(arrayData);
+    }
+
+    //Puts the generated list into the container for word bank
+    function displayWordBank(arrayData) {
+        var container = document.getElementById('answer-container');
+        container.innerHTML = generateWordBank(arrayData);
+    } 
+
+    var rIndexOne = -1;
+    var rIndexTwo = -1;
+    var cIndexOne = -1;
+    var cIndexTwo = -1;
+    
+
+    function clickFunctionCol(x){
+        console.log("column = " + x.cellIndex);
+
+        if(cIndexOne == -1){
+            cIndexOne = x.cellIndex;
+        }else{
+            cIndexTwo = x.cellIndex;
+=======
+>>>>>>> 8e9b9bb4200cb31e2559e80f8698af8c506fd75f
+        }
+    }
+
+    function clickFunctionRow(x){
+        console.log("row = " + x.rowIndex);
+        var WordGrid = document.getElementById('WordGrid');
+        
+
+        if(rIndexOne == -1){
+            rIndexOne = x.rowIndex;
+            var row = WordGrid.rows[rIndexOne];
+            var cell = row.cells[cIndexOne];
+            //cell.classList.toggle('selected');
+            cell.style.backgroundColor = localStorage.getItem('playerColor');
+        }else{
+            rIndexTwo = x.rowIndex;
+            checkWord();
+        }
+    }
+
+    function checkWord(){
+        console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
+        socket.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
+    }
+
+    function crossOutWord(FoundWordIndex){
+        var WordGrid = document.getElementById('WordGrid');
+        var ColDiff = (cIndexTwo - cIndexOne);
+        var RowDiff = (rIndexTwo - rIndexOne);
+        var row = WordGrid.rows[rIndexOne];
+        var cell = row.cells[cIndexOne];
+        
+        if(FoundWordIndex != -1){
+            //Cross Out Word in wordbank IF found word was correct
+            var wordBank = document.getElementById('WordBank');
+            wordBank.children[FoundWordIndex].classList.add('crossed-out');
+            
+            //Create line of highlighted boxes to fill out the whole word
+            for(var i = 0; i < Math.max(Math.abs(ColDiff), Math.abs(RowDiff)); i++){
+                if(RowDiff < 0){
+                    row = WordGrid.rows[rIndexOne -= 1];
+                }
+                if(RowDiff > 0){
+                    row = WordGrid.rows[rIndexOne += 1];
+                }
+                if(ColDiff < 0)
+                {
+                    cell = row.cells[cIndexOne -= 1];
+                }
+                if(ColDiff > 0){
+                    cell = row.cells[cIndexOne += 1];
+                }
+                cell.style.backgroundColor = localStorage.getItem('playerColor');
+            }
+            
+        }else{
+            //If FoundWordIndex was -1 that means no correct word was found so selected sqaure goes back 
+            //to default color
+            cell.style.backgroundColor = "cadetblue";
+        }
+
+        //Reset the index variables
+        rIndexOne = -1;
+        rIndexTwo = -1;
+        cIndexOne = -1;
+        cIndexTwo = -1;
+        
+    }
+
+    
 
         function generateTable(arrayData) {
         var table = '<table border="1" id="WordGrid" >';

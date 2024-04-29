@@ -47,6 +47,7 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -75,7 +76,7 @@ public class App extends WebSocketServer {
   private Vector<Game> ActiveGames = new Vector<Game>();
   private List<WebSocket> clients = new ArrayList<>();
   private List<Lobby> activeLobbies = new ArrayList<>();
-
+  private int GameId = 1;
 
   private int connectionId = 0;
 
@@ -113,7 +114,45 @@ public class App extends WebSocketServer {
     conn.send (jsonString);
     System.out.println("sending "+jsonString);
 
+    Game G = null;
 
+    //THIS IS FROM THE OLD APP.JAVA AND WILL NEED TO BE CHANGED TO GET RID OF
+    //TICTACTOE STUFF
+    for (Game i : ActiveGames) 
+    {
+      if (i.Players == uta.cse3310.PlayerType.XPLAYER) 
+      {
+        G = i;
+        System.out.println("found a match");
+      }
+    }
+
+    //No matches? Create a new Game.
+    if (G == null) 
+    {
+      G = new Game(stats);
+      G.GameId = GameId;
+      GameId++;
+      //Add the first player
+      G.Players = PlayerType.XPLAYER;
+      ActiveGames.add(G);
+      System.out.println(" creating a new Game");
+    } else 
+    {
+      //Join an existing game
+      System.out.println(" not a new game");
+      G.Players = PlayerType.OPLAYER;
+      G.StartGame();
+    }
+
+    Message GridMessage = new Message(G.grid.WordSearchGrid);
+    String GridJSONString = gson.toJson(GridMessage);
+    conn.send(GridJSONString);
+
+    //Sending WordBank to server
+    Message WordBank = new Message(G.grid.WordsUsed);
+    String WordBankJSONString = gson.toJson(WordBank);
+    conn.send(WordBankJSONString);
 
     // delete me String playerName = handshake.getFieldValue("playerName");
 
@@ -157,10 +196,38 @@ public class App extends WebSocketServer {
 
   @Override
   public void onMessage(WebSocket conn, String message) {
+    Game G = conn.getAttachment();
     System.out.println("Received message from client: " + message);
 
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
+
+    if(message.startsWith("WordCheck") == true)
+    {
+      int j = 0;
+      Boolean Found = false;
+      StringTokenizer string = new StringTokenizer(message," ");
+      string.nextToken(); 
+      String test = string.nextToken();
+      for (String i : G.grid.WordsUsedLocations)
+      {
+        if(test.equals(i)){
+          System.out.println("ITS ACTUALLY A WORD!");
+          Message FoundWord = new Message(j);
+          String FoundWordJSONString = gson.toJson(FoundWord);
+          conn.send(FoundWordJSONString);
+          Found = true;
+          break;
+        }
+        j++;
+      }
+      if(Found == false){
+        Message FoundWord = new Message(-1);
+        String FoundWordJSONString = gson.toJson(FoundWord);
+        conn.send(FoundWordJSONString);
+      }
+
+    }
 
     //broadcast the recieved message
    // broadcast(message);
