@@ -11,14 +11,17 @@
     <div class="landing-page">
         <h1>WORD GAME</h1>
         <img src="https://media.giphy.com/media/3o7aCTXVcHJgJ4yoeI/giphy.gif" alt="Pirate">
-        <h3>Type your Name to Enter the Lobby</h3>
+        <h3>Enter Name And Color To Enter</h3>
         <form id="nameForm">
             <label for="playerName">First Name:</label><br>
             <input type="text" id="playerName" name="playerName" required><br>
+
+            <label for="playerColor">Your Color:</label><br>
+            <input type="color" id="playerColor" name="playerColor" required><br>
+
             <input type="submit" value="Join">
         </form>
     </div>
-
 
     <div class="lobby-page">
         <h1 style="text-align: center;">WORD GAME LOBBY</h1>
@@ -31,8 +34,11 @@
                 </div>
                 <div class="box">
                     <h1 class="header_text">Leaderboard</h1>
+                    
+                    <ol id="leaderboard" style="list-style-type:none;"></ol>
+
                     <div class="button-container">
-                        <button id="button" onclick="view_leaderboard()">Click to View</button>
+                        <button id="button" onclick="">Click to View</button>
                     </div>
                 </div>
             </div>
@@ -59,11 +65,32 @@
         <button onclick="sendMessage()">Send</button>
     </div>
     
+    <div class="game-page">
+            <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
+
+            <div id="leftbox">
+                <h2> Player 1 Name </h2>
+            </div>
+
+            <div id="centerbox">
+                <div id="table-container"> 
+                    
+                </div>
+                <h2 style="text-align: center;"> WORD BANK </h2>
+                <div class="scroll-box" id="answer-container"> 
+
+                </div>
+            </div>
     
-    
+            <div id="rightbox">
+                <h2> Player 2 Name</h2>
+            </div>
+       
+    </div>
+</body>
     <script>
         // Establish WebSocket connection when the page loads
-        var serverUrl = 'ws://' + window.location.hostname + ':9124';
+        var serverUrl = "ws://" + window.location.hostname +":"+ (parseInt(location.port) + 100);
         var socket = new WebSocket(serverUrl);
         var playerNames = [];
 
@@ -71,18 +98,19 @@
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
-            //let playerNames; // = sessionStorage.getItem('playerNames');
-            //playerNames = playerNames ? JSON.parse(playerNames) : [];
 
-            //const playerName = "";//sessionStorage.getItem('playerName');
-            //if (playerName) {
-            //    socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-            //    console.log("sending " + JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-            //    displayNick(playerName, playerNames);
+            let storedPlayerNames = localStorage.getItem('playerNames');
+            playerNames = storedPlayerNames ? JSON.parse(storedPlayerNames) : [];
 
-                // Store the updated list of player names back to sessionStorage
-                //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-            //}
+            const playerName = localStorage.getItem('playerName');
+            if (playerName) {
+            socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+            console.log("sending " + JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+            displayNick(playerName, playerNames);
+
+            // Store the updated list of player names in localStorage
+            localStorage.setItem('playerNames', JSON.stringify(playerNames));
+            }
         };
         
 
@@ -109,6 +137,15 @@
             socket.send(JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
             console.log("sending " + JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
             //Lobby_display();
+
+
+            if (playerName) {
+                // Auto 0 to the new player
+                const startScore = 0;
+                
+                // Add the player
+                updateLeaderboard(playerName, startScore);
+            }
         });
       
 
@@ -155,20 +192,37 @@
         ConnectionID=-1;
 
         socket.onmessage = function(event) {
-            console.log('Message from server: ', event.data);
+            console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
            
-            if ('Type' in message) {
-                if (message.Type == "ID" ) {
-                   ConnectionID = message.ConnectionID;
-                   console.log("my connection id is " + ConnectionID);
-                }
-            } 
-            if (message.type === "sender") {
-                updatePlayerList(message.players); // Update the player list in the HTML
-          } else if ('sender' in message) {
+            switch(message.type){
+            case 'Grid':
+                console.log("Grid recieved");
+                displayWordSearch(message.grid);
+                break;
+            case 'WordBank':
+                console.log("WordBank recieved");
+                displayWordBank(message.WordsUsed);
+                break;  
+            case 'FoundWord':
+                console.log("FoundWord recieved");
+                crossOutWord(message.FoundWordIndex)
+                break;   
+            case 'ID':
+                ConnectionID = message.ConnectionID;
+                console.log("my connection id is " + ConnectionID);
+                break;
+            case 'sender':
+                updatePlayerList(message.players);
+                if ('sender' in message) {
                 displayMessage(message.sender, message.content);
-    }
+                }
+                break;
+            default:
+                console.log("Unkown message")
+                break;
+        }
+
 };
     
         
@@ -249,6 +303,15 @@
 
         function startGame() {
             const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
+            
+
+            
+            const lobbyPage = document.querySelector(".lobby-page");
+            const gamePage = document.querySelector(".game-page");
+            lobbyPage.style.display = "none";
+            gamePage.style.display = "block";
+
+            
             if (playerNickItems.length > 0) {
                 const firstPlayer = playerNickItems[0].textContent;
                 alert(firstPlayer + " has started the game!");
@@ -288,10 +351,161 @@
 
 
 
+        let leaderboardData = [];
+        function updateLeaderboard(playerName, score) {
+            // Check player is in leaderboard
+            const existPlayer = leaderboardData.findIndex(player => player.name === playerName);
+            
+            if (existPlayer !== -1) {
+                // Update score if they are already in  leaderboard
+                leaderboardData[existingPlayer].score = score;
+            } else {
+                // Add a new player
+                leaderboardData.push({ name: playerName, score: score });
+            }
+            
+            // Sort by score
+            leaderboardData.sort((a, b) => b.score - a.score);
+            
+            //update leaderboard
+            view_leaderboard();
+        }
+
         function view_leaderboard() {
             // window.location.href = 'Leaderboard.html';
             // causes the page to be loaded
+            const leaderboardElement = document.getElementById('leaderboard');
+    
+            // Clear leaderboard content
+            leaderboardElement.innerHTML = '';
+            
+            // Loop through the leaderboard per player
+            leaderboardData.forEach((player, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${player.name}: ${player.score}`;
+                leaderboardElement.appendChild(li);
+            });
         }
+
+        function generateTable(arrayData) {
+        var table = '<table border="1" id="WordGrid" >';
+            for (var i = 0; i < arrayData.length; i++) {
+                table += '<tr onclick="clickFunctionRow(this)">';
+                for (var j = 0; j < arrayData[i].length; j++) {
+                    //table += '<td>' + arrayData[i][j] + '</td>';
+                    table += '<td onclick="clickFunctionCol(this)">' + arrayData[i][j] + '</td>';
+                }
+                table += '</tr>';
+            }
+        table += '</table>';
+        return table;
+    }
+
+    //Generates the list of words for the word bank
+    function generateWordBank(arrayData) {
+        var table = '<ul id=WordBank>';
+            for (var i = 0; i < arrayData.length; i++) {
+                table += '<li>' + arrayData[i] + '</li>'
+            }
+        table += '</ul>';
+        return table;
+    }
+
+    //Puts the generated table into the container for word search
+    function displayWordSearch(arrayData) {
+        var container = document.getElementById('table-container');
+        container.innerHTML = generateTable(arrayData);
+    }
+
+    //Puts the generated list into the container for word bank
+    function displayWordBank(arrayData) {
+        var container = document.getElementById('answer-container');
+        container.innerHTML = generateWordBank(arrayData);
+    } 
+
+    var rIndexOne = -1;
+    var rIndexTwo = -1;
+    var cIndexOne = -1;
+    var cIndexTwo = -1;
+    
+
+    function clickFunctionCol(x){
+        console.log("column = " + x.cellIndex);
+
+        if(cIndexOne == -1){
+            cIndexOne = x.cellIndex;
+        }else{
+            cIndexTwo = x.cellIndex;
+        }
+    }
+
+    function clickFunctionRow(x){
+        console.log("row = " + x.rowIndex);
+        var WordGrid = document.getElementById('WordGrid');
+        
+
+        if(rIndexOne == -1){
+            rIndexOne = x.rowIndex;
+            var row = WordGrid.rows[rIndexOne];
+            var cell = row.cells[cIndexOne];
+            //cell.classList.toggle('selected');
+            cell.style.backgroundColor = localStorage.getItem('playerColor');
+        }else{
+            rIndexTwo = x.rowIndex;
+            checkWord();
+        }
+    }
+
+    function checkWord(){
+        console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
+        socket.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
+    }
+
+    function crossOutWord(FoundWordIndex){
+        var WordGrid = document.getElementById('WordGrid');
+        var ColDiff = (cIndexTwo - cIndexOne);
+        var RowDiff = (rIndexTwo - rIndexOne);
+        var row = WordGrid.rows[rIndexOne];
+        var cell = row.cells[cIndexOne];
+        
+        if(FoundWordIndex != -1){
+            //Cross Out Word in wordbank IF found word was correct
+            var wordBank = document.getElementById('WordBank');
+            wordBank.children[FoundWordIndex].classList.add('crossed-out');
+            
+            //Create line of highlighted boxes to fill out the whole word
+            for(var i = 0; i < Math.max(Math.abs(ColDiff), Math.abs(RowDiff)); i++){
+                if(RowDiff < 0){
+                    row = WordGrid.rows[rIndexOne -= 1];
+                }
+                if(RowDiff > 0){
+                    row = WordGrid.rows[rIndexOne += 1];
+                }
+                if(ColDiff < 0)
+                {
+                    cell = row.cells[cIndexOne -= 1];
+                }
+                if(ColDiff > 0){
+                    cell = row.cells[cIndexOne += 1];
+                }
+                cell.style.backgroundColor = localStorage.getItem('playerColor');
+            }
+            
+        }else{
+            //If FoundWordIndex was -1 that means no correct word was found so selected sqaure goes back 
+            //to default color
+            cell.style.backgroundColor = "cadetblue";
+        }
+
+        //Reset the index variables
+        rIndexOne = -1;
+        rIndexTwo = -1;
+        cIndexOne = -1;
+        cIndexTwo = -1;
+        
+    }
+
+    
 
     </script>
 </body>
