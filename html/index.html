@@ -210,11 +210,22 @@
                 console.log("FoundWord recieved");
                 crossOutWord(message.FoundWordIndex)
                 break;   
+            case 'ID':
+                ConnectionID = message.ConnectionID;
+                console.log("my connection id is " + ConnectionID);
+                break;
+            case 'sender':
+                updatePlayerList(message.players);
+                if ('sender' in message) {
+                displayMessage(message.sender, message.content);
+                }
+                break;
             default:
                 console.log("Unkown message")
                 break;
         }
 
+        /*
             if ('Type' in message) {
                 if (message.Type == "ID" ) {
                    ConnectionID = message.ConnectionID;
@@ -226,6 +237,7 @@
           } else if ('sender' in message) {
                 displayMessage(message.sender, message.content);
     }
+    */
 };
     
         
