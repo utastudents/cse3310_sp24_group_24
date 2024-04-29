@@ -11,18 +11,17 @@
     <div class="landing-page">
         <h1>WORD GAME</h1>
         <img src="https://media.giphy.com/media/3o7aCTXVcHJgJ4yoeI/giphy.gif" alt="Pirate">
-        <h3>Choose Your Name And Color To Play</h3>
+        <h3>Enter Name And Color To Enter</h3>
         <form id="nameForm">
             <label for="playerName">First Name:</label><br>
             <input type="text" id="playerName" name="playerName" required><br>
 
             <label for="playerColor">Your Color:</label><br>
             <input type="color" id="playerColor" name="playerColor" required><br>
-            
+
             <input type="submit" value="Join">
         </form>
     </div>
-
 
     <div class="lobby-page">
         <h1 style="text-align: center;">WORD GAME LOBBY</h1>
@@ -67,35 +66,35 @@
     </div>
     
     <div class="game-page">
-        <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
+            <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
 
-        <div id="leftbox">
-            <h2> Player 1 Name </h2>
-        </div>
-
-        <div id="centerbox">
-            <div id="table-container"> 
-                
+            <div id="leftbox">
+                <h2> Player 1 Name </h2>
             </div>
-            <h2 style="text-align: center;"> WORD BANK </h2>
-            <div class="scroll-box" id="answer-container"> 
 
+            <div id="centerbox">
+                <div id="table-container"> 
+                    
+                </div>
+                <h2 style="text-align: center;"> WORD BANK </h2>
+                <div class="scroll-box" id="answer-container"> 
+
+                </div>
             </div>
-        </div>
-
-        <div id="rightbox">
-            <h2> Player 2 Name</h2>
-        </div>
-   
-    </div>
     
+            <div id="rightbox">
+                <h2> Player 2 Name</h2>
+            </div>
+       
+    </div>
+</body>
     <script>
         // Establish WebSocket connection when the page loads
         var serverUrl = 'ws://' + window.location.hostname + ':9124';
         var socket = new WebSocket(serverUrl);
         var playerNames = [];
 
-        socket.onopen = function(evt) {
+        socket.onopen = function() {
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
@@ -225,19 +224,6 @@
                 break;
         }
 
-        /*
-            if ('Type' in message) {
-                if (message.Type == "ID" ) {
-                   ConnectionID = message.ConnectionID;
-                   console.log("my connection id is " + ConnectionID);
-                }
-            } 
-            if (message.type === "sender") {
-                updatePlayerList(message.players); // Update the player list in the HTML
-          } else if ('sender' in message) {
-                displayMessage(message.sender, message.content);
-    }
-    */
 };
     
         
@@ -318,12 +304,15 @@
 
         function startGame() {
             const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
-            //transport to Lobby3
+            
+
+            
             const lobbyPage = document.querySelector(".lobby-page");
             const gamePage = document.querySelector(".game-page");
             lobbyPage.style.display = "none";
             gamePage.style.display = "block";
 
+            
             if (playerNickItems.length > 0) {
                 const firstPlayer = playerNickItems[0].textContent;
                 alert(firstPlayer + " has started the game!");
@@ -470,7 +459,7 @@
 
     function checkWord(){
         console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
-        connection.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
+        socket.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
     }
 
     function crossOutWord(FoundWordIndex){
@@ -517,6 +506,7 @@
         
     }
 
+    
 
     </script>
 </body>
