@@ -66,7 +66,28 @@
         <button onclick="sendMessage()">Send</button>
     </div>
     
-    
+    <div class="game-page">
+        <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
+
+        <div id="leftbox">
+            <h2> Player 1 Name </h2>
+        </div>
+
+        <div id="centerbox">
+            <div id="table-container"> 
+                
+            </div>
+            <h2 style="text-align: center;"> WORD BANK </h2>
+            <div class="scroll-box" id="answer-container"> 
+
+            </div>
+        </div>
+
+        <div id="rightbox">
+            <h2> Player 2 Name</h2>
+        </div>
+   
+    </div>
     
     <script>
         // Establish WebSocket connection when the page loads
@@ -78,6 +99,8 @@
             console.log('Connected to server');
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
+            const gamePage = document.querySelector(".game-page");
+            gamePage.style.display = "none";
             //let playerNames; // = sessionStorage.getItem('playerNames');
             //playerNames = playerNames ? JSON.parse(playerNames) : [];
 
@@ -284,7 +307,11 @@
         function startGame() {
             const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
             //transport to Lobby3
-            window.location.href = 'Lobby3.html';
+            const lobbyPage = document.querySelector(".lobby-page");
+            const gamePage = document.querySelector(".game-page");
+            lobbyPage.style.display = "none";
+            gamePage.style.display = "block";
+
             if (playerNickItems.length > 0) {
                 const firstPlayer = playerNickItems[0].textContent;
                 alert(firstPlayer + " has started the game!");
