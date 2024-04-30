@@ -196,7 +196,7 @@
             }
         
     
-        ConnectionID=-1;
+        //ConnectionID=-1;
 
         socket.onmessage = function(event) {
             console.log('Message from server: ' +  event.data);
@@ -314,11 +314,13 @@
 
             
             const lobbyPage = document.querySelector(".lobby-page");
+            const landingPage = document.querySelector(".landing-page");
             const gamePage = document.querySelector(".game-page");
             lobbyPage.style.display = "none";
-            gamePage.style.display = "block";
-            //here
             landingPage.style.display = "none";
+            gamePage.style.display = "block";
+            
+            
 
             
             if (playerNickItems.length > 0) {
