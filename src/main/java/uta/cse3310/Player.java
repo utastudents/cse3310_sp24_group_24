@@ -36,6 +36,12 @@ public class Player {
     public int getConnectionID(){
         return connectionID;
     }
+    
+    public int setPoints(int points)
+    {
+        this.PlayerPoints = points;
+        return points;
+    }
 
     //getter for player list
     public static List<String> getPlayerList() {
