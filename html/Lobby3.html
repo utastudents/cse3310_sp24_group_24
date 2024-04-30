@@ -49,7 +49,7 @@
 </head>
     <body>
         <div id="boxes">
-            <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
+            <h1 style="text-align: center;"> WORD SEARCH GAME</h1>
 
             <div id="leftbox">
                 <h2> Player 1 Name </h2>
@@ -59,7 +59,7 @@
                 <div id="table-container"> 
                     
                 </div>
-                <h2 style="text-align: center;"> WORD BANK </h2>
+                <h2 style="text-align: center;"> WORD BANK</h2>
                 <div class="scroll-box" id="answer-container"> 
 
                 </div>
@@ -133,15 +133,71 @@
         return table;
     }
 
-    //Generates the list of words for the word bank
-    function generateWordBank(arrayData) {
-        var table = '<ul id=WordBank>';
-            for (var i = 0; i < arrayData.length; i++) {
-                table += '<li>' + arrayData[i] + '</li>'
+
+
+    let wordlist = [];
+    let newlist = [];
+    const density = 0.68;
+    const grid = 20*20;
+    let charCount = 0;
+    let check=0;
+
+
+    // Generates the list of words for the word bank
+    async function generateWordBank() {
+        // Read file and limit the number of lines
+        try {
+            const res = await fetch("words.txt");
+           const text = await res.text();
+            
+            // Split the text into lines and remove empty lines
+            wordlist = text.split(/\r?\n/).filter(word => word.trim().length > 0);
+
+        } catch (e) {
+            console.error("Error reading words.txt:", e);
+            return;
+        }
+
+        // Loop to check density and add words to list
+        while (check < density) {
+            // Choose a random word from the list
+            let oneword = wordlist[Math.floor(Math.random() * wordlist.length)];
+            console.log(`ratio: ${charCount / grid},density: ${density}`);
+            // If word is not already in the new list, add
+            if (!newlist.includes(oneword)) {
+                newlist.push(oneword);
+                charCount += oneword.length;
             }
+            
+           
+            check = charCount/grid;
+        }
+        console.log('Contents of newlist:', newlist);
+        // add word bank to show hmtl
+        let table = '<ul id="WordBank">';
+        for (const word of newlist) {
+            table += `<li>${word}</li>`;
+        }
         table += '</ul>';
+
         return table;
     }
+
+    // HTML into a container
+    generateWordBank().then((wordBankHTML) => {
+        const container = document.getElementById('answer-container');
+        if (container) {
+             // Insert the word bank to HTML
+            container.innerHTML = wordBankHTML;
+        } else {
+            console.error("Container element 'answer-container' not found.");
+        }
+    }).catch((error) => {
+        console.error("Error in generating word bank:", error);
+    });
+
+
+
 
     //Puts the generated table into the container for word search
     function displayWordSearch(arrayData) {
