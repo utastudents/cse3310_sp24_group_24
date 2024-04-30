@@ -277,14 +277,24 @@
 
         function startGame() {
             
-            window.location.href = 'Lobby3.html';
-            
-            const lobbyPage = document.querySelector(".lobby-page");
+            //window.location.href = 'Lobby3.html';
             const landingPage = document.querySelector(".landing-page");
+            const lobbyPage = document.querySelector(".lobby-page");
             const gamePage = document.querySelector(".game-page");
-            lobbyPage.style.display = "none";
-            landingPage.style.display = "none";
-            gamePage.style.display = "block";
+            if (playerNickItems.length >= 2) {
+                const firstPlayer = playerNickItems[0].textContent;
+                alert(firstPlayer + " has started the game!");
+                connection.send("startGame");
+                lobbyPage.style.display = "none";
+                landingPage.style.display = "none";
+                gamePage.style.display = "block";
+                beginButtonContainer.style.display = "block"; // Show Begin button if this is the first player
+
+            } else {
+                alert("No players in the lobby yet!");
+                beginButtonContainer.style.display = "none"; // Hide Begin button if this is the first player
+            }
+
         }
         
         function EnterQueue() {
@@ -316,7 +326,7 @@
             
             if (existPlayer !== -1) {
                 // Update score if they are already in  leaderboard
-                leaderboardData[existingPlayer].score = score;
+                leaderboardData[existPlayer].score = score;
             } else {
                 // Add a new player
                 leaderboardData.push({ name: playerName, score: score });
