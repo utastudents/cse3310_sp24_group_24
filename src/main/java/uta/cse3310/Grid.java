@@ -51,6 +51,9 @@ public class Grid {
 
     //Gen words 8 directions
     static final int[][] DIRS = {
+            // Horizontal Right (0), Vertical Down (1), Diagonal Down Right (2), Diagonal Up
+            // Right (3), Horizontal Left (4), Vertical Down (5), Diagonal Down Left (6),
+            // Diagonal Up Left (7)
             { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 }, { -1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 1 }
     };
 
@@ -104,17 +107,24 @@ public class Grid {
         }
     
         public int tryPlaceWord(char[][] WordSearchGrid, String word){
-            //Choses a random direction from DIRS and then random starting position
+            // Choses a random direction from DIRS and then random starting position
             int RandomDirection = random.nextInt(DIRS.length);
             int RandomPosition = random.nextInt(GridArea);
 
+            // Choose a direction for the word
             for (int dir = 0; dir < DIRS.length; dir++) {
                 dir = (dir + RandomDirection) % DIRS.length;
                 
+                // Choose a random position value for the row and column starting position.
                 for (int pos = 0; pos < GridArea; pos++) {
                     pos = (pos + RandomPosition) % GridArea;
                     
-                    int CellsUsed = tryLocation(WordSearchGrid, word, dir, pos); 
+                    // Moved r and c here so tryLocation is testable. -Chime
+                    // r = Row, c = Column
+                    int r = pos / GridSize;
+                    int c = pos % GridSize;
+
+                    int CellsUsed = tryLocation(WordSearchGrid, word, dir, r, c); 
 
                     if(CellsUsed > 0){
                         return CellsUsed;
@@ -125,9 +135,7 @@ public class Grid {
             return 0;
         }
 
-    public int tryLocation(char[][] WordSearchGrid, String word, int dir, int pos) {
-        int r = pos / GridSize;
-        int c = pos % GridSize;
+    public int tryLocation(char[][] WordSearchGrid, String word, int dir, int r, int c) {
         int length = word.length();
 
         // check bounds

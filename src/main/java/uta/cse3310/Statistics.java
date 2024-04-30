@@ -3,12 +3,12 @@ package uta.cse3310;
 public class Statistics {
     // this class stores global statistics of the
     // program
-    private Long RunningTime;
-    private Integer XWins;
-    private Integer OWins;
-    private Integer Draws;
-    private Integer TotalGames;
-    private Integer GamesInProgress;
+    public Long RunningTime;
+    public Integer XWins;
+    public Integer OWins;
+    public Integer Draws;
+    public Integer TotalGames;
+    public Integer GamesInProgress;
 
     public Statistics() {
         RunningTime = 0L;
