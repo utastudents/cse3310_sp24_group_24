@@ -47,7 +47,6 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -68,7 +67,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
 public class App extends WebSocketServer {
 
   // All games currently underway on this server are stored in
@@ -76,8 +74,8 @@ public class App extends WebSocketServer {
   private Vector<Game> ActiveGames = new Vector<Game>();
   private List<WebSocket> clients = new ArrayList<>();
   private List<Lobby> activeLobbies = new ArrayList<>();
-  private int GameId = 1;
 
+  private Lobby L;
   private int connectionId = 0;
 
   private Instant startTime;
@@ -86,7 +84,7 @@ public class App extends WebSocketServer {
 
   public App(int port) {
     super(new InetSocketAddress(port));
-    
+
   }
 
   public App(InetSocketAddress address) {
@@ -101,6 +99,7 @@ public class App extends WebSocketServer {
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
     connectionId++;
+    Lobby L;
 
     clients.add(conn);
 
@@ -111,72 +110,32 @@ public class App extends WebSocketServer {
     E.ConnectionID = connectionId;
     Gson gson = new Gson();
     String jsonString = gson.toJson(E);
-    conn.send (jsonString);
-    System.out.println("sending "+jsonString);
-
-    Game G = null;
-
-    //THIS IS FROM THE OLD APP.JAVA AND WILL NEED TO BE CHANGED TO GET RID OF
-    //TICTACTOE STUFF
-    for (Game i : ActiveGames) 
-    {
-      if (i.Players == uta.cse3310.PlayerType.XPLAYER) 
-      {
-        G = i;
-        System.out.println("found a match");
-      }
-    }
-
-    //No matches? Create a new Game.
-    if (G == null) 
-    {
-      G = new Game(stats);
-      G.GameId = GameId;
-      GameId++;
-      //Add the first player
-      G.Players = PlayerType.XPLAYER;
-      ActiveGames.add(G);
-      System.out.println(" creating a new Game");
-    } else 
-    {
-      //Join an existing game
-      System.out.println(" not a new game");
-      G.Players = PlayerType.OPLAYER;
-      G.StartGame();
-    }
-
-    Message GridMessage = new Message(G.grid.WordSearchGrid);
-    String GridJSONString = gson.toJson(GridMessage);
-    conn.send(GridJSONString);
-
-    //Sending WordBank to server
-    Message WordBank = new Message(G.grid.WordsUsed);
-    String WordBankJSONString = gson.toJson(WordBank);
-    conn.send(WordBankJSONString);
+    conn.send(jsonString);
+    System.out.println("sending " + jsonString);
 
     // delete me String playerName = handshake.getFieldValue("playerName");
 
     // delete me System.out.println("the player name is "+ playerName);
 
-    //Player newPlayer = new Player(playerName);
+    // Player newPlayer = new Player(playerName);
 
-    //Lobby lobby = findAvailableLobby();
-    //if (lobby == null) {
-     // lobby = createNewLobby();
-   // }
-    //lobby.addPlayer(new Player(playerName)); // Add player to the lobby
+    // Lobby lobby = findAvailableLobby();
+    // if (lobby == null) {
+    // lobby = createNewLobby();
+    // }
+    // lobby.addPlayer(new Player(playerName)); // Add player to the lobby
 
     // Set the lobby as an attachment to the connection
-    //conn.setAttachment(lobby);
+    // conn.setAttachment(lobby);
 
     // Send lobby information to the connected client
     // Gson gson = new Gson();
-    //String jsonString = gson.toJson(lobby);
-    //conn.send(jsonString);
-    //System.out.println("Sending "+jsonString);
+    // String jsonString = gson.toJson(lobby);
+    // conn.send(jsonString);
+    // System.out.println("Sending "+jsonString);
 
     // Broadcast lobby information to all clients
-    //broadcast(gson.toJson(lobby));
+    // broadcast(gson.toJson(lobby));
   }
 
   @Override
@@ -188,156 +147,132 @@ public class App extends WebSocketServer {
       if (player != null) {
         lobby.removePlayer(player); // Remove player from the lobby
         clients.remove(conn);
+      }
     }
-}
 
-    }
-  
+  }
 
   @Override
   public void onMessage(WebSocket conn, String message) {
-    Game G = conn.getAttachment();
     System.out.println("Received message from client: " + message);
 
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
 
-    if(message.startsWith("WordCheck") == true)
-    {
-      int j = 0;
-      Boolean Found = false;
-      StringTokenizer string = new StringTokenizer(message," ");
-      string.nextToken(); 
-      String test = string.nextToken();
-      for (String i : G.grid.WordsUsedLocations)
-      {
-        if(test.equals(i)){
-          System.out.println("ITS ACTUALLY A WORD!");
-          Message FoundWord = new Message(j);
-          String FoundWordJSONString = gson.toJson(FoundWord);
-          conn.send(FoundWordJSONString);
-          Found = true;
-          break;
-        }
-        j++;
-      }
-      if(Found == false){
-        Message FoundWord = new Message(-1);
-        String FoundWordJSONString = gson.toJson(FoundWord);
-        conn.send(FoundWordJSONString);
-      }
+    // broadcast the recieved message
+    // broadcast(message);
+    // Player newPlayer = new Player(playerName);
 
-    }
-
-    //broadcast the recieved message
-   // broadcast(message);
-   //Player newPlayer = new Player(playerName);
-
-    
-     // Add player to the lobby
+    // Add player to the lobby
 
     // Set the lobby as anttachment to the connection
-    //conn.setAttachment(lobby);
+    // conn.setAttachment(lobby);
 
     // Send lobby information to the connected client
     // Gson gson = new Gson();
-    //String jsonString = gson.toJson(lobby);
-    //conn.send(jsonString);
-    //System.out.println("Sending "+jsonString);
+    // String jsonString = gson.toJson(lobby);
+    // conn.send(jsonString);
+    // System.out.println("Sending "+jsonString);
 
     // Broadcast lobby information to all clients
-    //broadcast(gson.toJson(lobby));
-    
-      NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
-      Lobby lobbys = conn.getAttachment();
-      Lobby lobby = findAvailableLobby();
-      if (lobby == null) {
-        lobby = createNewLobby();
-        }
-        Player player = new Player(N.ConnectionID, N.playerName, 0, "");
-        lobby.addPlayer(player);
+    // broadcast(gson.toJson(lobby));
+    if (false) {
+      NewNameEvent N = gson.fromJson(message, NewNameEvent.class);
+      // Lobby lobbys = conn.getAttachment();
+      // Lobby lobby = findAvailableLobby();
+      if (L == null) {
+        L = createNewLobby();
+      }
+      Player player = new Player(N.ConnectionID, N.playerName, 0, "");
+      L.addPlayer(player);
 
       Message mO = gson.fromJson(message, Message.class);
       String sender = mO.getSender();
       String content = mO.getContent();
       System.out.println(sender + " : " + content);
-      if("playerNick".equals(mO.getContent()));
+      if ("playerNick".equals(mO.getContent()))
+        ;
       {
-        String chatMessage = sender +  ":" + content;
+        String chatMessage = sender + ":" + content;
         String jsonMessage = gson.toJson(new Message(player, content));
         broadcast(chatMessage);
-        //broadcast(message);
-  
+        // broadcast(message);
+
       }
+    }
+    // if (message.contains("content")) {
+    // Use JSON parsing to extract sender and content
 
-    //if (message.contains("content")) {
-      // Use JSON parsing to extract sender and content
+    // Message messageObject = gson.fromJson(message, Message.class);
 
-      //Message messageObject = gson.fromJson(message, Message.class);
-      
-      // Create the chat string
-      //String chatstring = message.sender + ": " + message.content;
-      
-      // Broadcast the chat string
-      //broadcast(message);
+    // Create the chat string
+    // String chatstring = message.sender + ": " + message.content;
 
-  //}
-  
+    // Broadcast the chat string
+    // broadcast(message);
 
+    // }
 
+    if (L == null) {
+      L = createNewLobby();
+    }
 
     // each kind of message is processed here
-    if (message.indexOf("newPlayer")>0) {
+    if (message.indexOf("newPlayer") > 0) {
 
-           // this is of type 
-           //Received message from client: {"Type":"newPlayer","playerName":"aaaa","ConnectioID":1}
-           //NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
-           System.out.println("the name is " + N.playerName + " "+ N.ConnectionID);
-           //new code added//
-           //Player playername = new Player(N.ConnectionID, N.playerName, 0, ""); 
-          // Checking to see if players names are being added to the list
-           Player.printPlayerList();
-           broadcastPlayerList();
+      // this is of type
+      // Received message from client:
+      // {"Type":"newPlayer","playerName":"aaaa","ConnectioID":1}
+      NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
+      System.out.println("the name is " + N.playerName + " " + N.ConnectionID);
+      // new code added//
+      // Player playername = new Player(N.ConnectionID, N.playerName, 0, "");
+      // Checking to see if players names are being added to the list
+      Player P = new Player(N.ConnectionID,N.playerName,0,"green");
+      L.addPlayer(P);
+      // since the lobby has changed, let's send it out to everyone
 
+      String jsonString = gson.toJson(L);
+      broadcast(jsonString);
+      // Player.printPlayerList();
+      // broadcastPlayerList();
+      // }
 
-        }
-     
     }
-     private void broadcastPlayerList() {
-      List<String> playerNames = Player.getPlayerList();
-      Gson gson = new Gson();
-      String jsonPlayerList = gson.toJson(playerNames);
-      JsonObject broadcastMessage = new JsonObject();
-        broadcastMessage.addProperty("type", "playerList");
-        broadcastMessage.add("players", gson.toJsonTree(playerNames));
+  }
 
-        // Send the player list to all connected clients
-        for (WebSocket client : clients) {
-            client.send(broadcastMessage.toString());
-        }
-    }
-      //broadcast(jsonPlayerList); // Send the player list to all connected clients
-  
-  
+  // private void broadcastPlayerList() {
+  // List<String> playerNames = Player.getPlayerList();
+  // Gson gson = new Gson();
+  // String jsonPlayerList = gson.toJson(playerNames);
+  // JsonObject broadcastMessage = new JsonObject();
+  // broadcastMessage.addProperty("type", "playerList");
+  // broadcastMessage.add("players", gson.toJsonTree(playerNames));
 
+  // Send the player list to all connected clients
+  // for (WebSocket client : clients) {
+  // client.send(broadcastMessage.toString());
+  // }
+  // }
+  // broadcast(jsonPlayerList); // Send the player list to all connected clients
 
-    // Construct the broadcast message
-    //String sender = message.getSender();
-    //String content = message.getContent();
-    
-    // Broadcast the message to all connected clients
-   /*  public void broadcast(String message)
-    {
-     //Message broadcastMessage = new Message(message.sender, message.content);
-    //String jsonMessage = gson.toJson(broadcastMessage);
-    //System.out.println("broadcast " + jsonMessage);
-    //broadcast(jsonMessage);
-    for (WebSocket client : clients) {
-        client.send(message);
-       }
-   } */
+  // Construct the broadcast message
+  // String sender = message.getSender();
+  // String content = message.getContent();
 
-
+  // Broadcast the message to all connected clients
+  /*
+   * public void broadcast(String message)
+   * {
+   * //Message broadcastMessage = new Message(message.sender, message.content);
+   * //String jsonMessage = gson.toJson(broadcastMessage);
+   * //System.out.println("broadcast " + jsonMessage);
+   * //broadcast(jsonMessage);
+   * for (WebSocket client : clients) {
+   * client.send(message);
+   * }
+   * }
+   */
 
   @Override
   public void onMessage(WebSocket conn, ByteBuffer message) {
