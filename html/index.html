@@ -354,7 +354,7 @@
             var playerExistInQueue = 0;
             const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
             for(i = 0; i <= playerNames.length; i++) {
-                if (playerName!=playerNames[i]) {
+                if (playerName==playerNames[i]) {
                     playerExistInQueue = 1;
                     break;
                 }
