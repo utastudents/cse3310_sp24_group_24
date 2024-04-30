@@ -232,9 +232,9 @@ public class App extends WebSocketServer {
       L.addPlayer(P);
       // since the lobby has changed, let's send it out to everyone
 
-      String jsonString = gson.toJson(L);
-      conn.send(jsonString);
-      //broadcast(jsonString);
+      String jsonString = gson.toJson(L.Players);
+      //conn.send(jsonString);
+      broadcast(jsonString);
       // Player.printPlayerList();
       // broadcastPlayerList();
       // }
