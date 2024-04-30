@@ -4,5 +4,5 @@ public class ServerEvent {
     PlayerType YouAre; // Either an XPLAYER or a YPLAYER
     int GameId;
     int ConnectionID;
-    String Type ="ID";
+    String type = "ID";
 }

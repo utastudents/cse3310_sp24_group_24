@@ -22,19 +22,19 @@ public class Player {
 
     //Getter for player name
     public String getName(){
-
         return PlayerName;
     }
 
     //Getter for player points
     public int getPoints(){
-
-        return 1;
+        return PlayerPoints;
     }
     //Getter for player color
     public String getColor(){
-
-        return "player color";
+        return PlayerColor;
+    }
+    public int getConnectionID(){
+        return connectionID;
     }
 
     //getter for player list

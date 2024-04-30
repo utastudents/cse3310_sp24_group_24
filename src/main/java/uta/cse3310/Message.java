@@ -12,7 +12,7 @@ public class Message {
     private String content;
 
     public Message() {
-        // Default constructor
+        this.type = "Basic";
         String content;
     }
 

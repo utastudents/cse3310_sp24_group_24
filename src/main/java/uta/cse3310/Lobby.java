@@ -8,7 +8,7 @@ public class Lobby {
     private List<Player> readyQueue;
     private PlayerType gameController; // Added field to track game controller
     private final int MAX_PLAYERS_PER_GAME = 4; // Maximum players per game
-    private String Type = "Lobby";
+    private String type = "Lobby";
 
     public Lobby() {
         players = new ArrayList<>();
@@ -56,7 +56,7 @@ public class Lobby {
     }
 
     public synchronized void addToReadyQueue(Player player) {
-        if (!(readyQueue.contains(player))) {
+        if (!readyQueue.contains(player)) {
             readyQueue.add(player);
         }
         // Start the game if the game controller is ready and there are enough players
@@ -71,6 +71,10 @@ public class Lobby {
 
     public synchronized List<Player> getReadyQueue() {
         return new ArrayList<>(readyQueue);
+    }
+
+    public synchronized int getReadyQueueSize(){
+        return readyQueue.size();
     }
 
     public synchronized void startGame() {

@@ -47,6 +47,7 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -113,9 +114,7 @@ public class App extends WebSocketServer {
     conn.send(jsonString);
     System.out.println("sending " + jsonString);
 
-    // delete me String playerName = handshake.getFieldValue("playerName");
-
-    // delete me System.out.println("the player name is "+ playerName);
+   
 
     // Player newPlayer = new Player(playerName);
 
@@ -155,10 +154,12 @@ public class App extends WebSocketServer {
   @Override
   public void onMessage(WebSocket conn, String message) 
   {
+    Game G = new Game(stats);
     System.out.println("Received message from client: " + message);
 
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
+    
 
     // broadcast the recieved message
     // broadcast(message);
@@ -177,6 +178,7 @@ public class App extends WebSocketServer {
 
     // Broadcast lobby information to all clients
     // broadcast(gson.toJson(lobby));
+    /*
     if (false) {
       NewNameEvent N = gson.fromJson(message, NewNameEvent.class);
       // Lobby lobbys = conn.getAttachment();
@@ -198,8 +200,9 @@ public class App extends WebSocketServer {
         broadcast(chatMessage);
         // broadcast(message);
       }
-      
     }
+      */
+    
     // if (message.contains("content")) {
     // Use JSON parsing to extract sender and content
 
@@ -217,31 +220,94 @@ public class App extends WebSocketServer {
       L = createNewLobby();
     }
 
-    // each kind of message is processed here
+    //Checking if the message is a newPlayer message
     if (message.indexOf("newPlayer") > 0) {
-
-      // this is of type
-      // Received message from client:
-      // {"Type":"newPlayer","playerName":"aaaa","ConnectioID":1}
+      
+      // Received message from client: {"type":"newPlayer","playerName":"aaaa","ConnectioID":1}
       NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
-      System.out.println("the name is " + N.playerName + " " + N.ConnectionID);
-      // new code added//
-      // Player playername = new Player(N.ConnectionID, N.playerName, 0, "");
-      // Checking to see if players names are being added to the list
-      Player P = new Player(N.ConnectionID,N.playerName,0,"green");
+      System.out.println("The name is: " + N.playerName + ", The Connection ID is: " + N.ConnectionID + ", The color is: " + N.playerColor) ;
+      
+      Player P = new Player(N.ConnectionID,N.playerName,0,N.playerColor);
       L.addPlayer(P);
-      // since the lobby has changed, let's send it out to everyone
 
-      String jsonString = gson.toJson(L.Players);
+      // since the lobby has changed, let's send it out to everyone
+  
+      String jsonString = gson.toJson(L);
       //conn.send(jsonString);
       broadcast(jsonString);
       // Player.printPlayerList();
       // broadcastPlayerList();
       // }
-
     }
-  }
 
+    //Checking if the message is a player readying up
+    if (message.indexOf("readyPlayer") > 0) {
+      NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
+      L.addToReadyQueue(L.getPlayerByName(N.playerName));
+      
+      // since the lobby has changed, let's send it out to everyone
+  
+      String jsonString = gson.toJson(L);
+      broadcast(jsonString);
+    }
+
+    if (message.startsWith("GamePlayer") == true) {
+      StringTokenizer string = new StringTokenizer(message," ");
+      string.nextToken();
+      String name1 = string.nextToken();
+      String name2 = string.nextToken();
+
+      if(L.getReadyQueueSize() < 2)
+      {
+        //ADD SOMETHING HERE TO DISPLAY NOT ENOUGH READY ON HTML
+        System.out.println("not enough to start");
+      }else{
+        L.removeFromReadyQueue(L.getPlayerByName(name1));
+        L.removeFromReadyQueue(L.getPlayerByName(name2));
+        String jsonString = gson.toJson(L);
+        broadcast(jsonString);
+
+        //THIS PART NEEDS ADJUSTMENTS
+        
+
+        Message GridMessage = new Message(G.grid.WordSearchGrid);
+        String GridJSONString = gson.toJson(GridMessage);
+        conn.send(GridJSONString);
+
+        //Sending WordBank to server
+        Message WordBank = new Message(G.grid.WordsUsed);
+        String WordBankJSONString = gson.toJson(WordBank);
+        conn.send(WordBankJSONString);
+      }
+    }
+  
+    if(message.startsWith("WordCheck") == true)
+    {
+      
+      int j = 0;
+      Boolean Found = false;
+      StringTokenizer string = new StringTokenizer(message," ");
+      string.nextToken(); 
+      String test = string.nextToken();
+      for (String i : G.grid.WordsUsedLocations)
+      {
+        if(test.equals(i)){
+          System.out.println("ITS ACTUALLY A WORD!");
+          Message FoundWord = new Message(j);
+          String FoundWordJSONString = gson.toJson(FoundWord);
+          conn.send(FoundWordJSONString);
+          Found = true;
+          break;
+        }
+        j++;
+      }
+      if(Found == false){
+        Message FoundWord = new Message(-1);
+        String FoundWordJSONString = gson.toJson(FoundWord);
+        conn.send(FoundWordJSONString);
+      }
+  }
+  }
   // private void broadcastPlayerList() {
   // List<String> playerNames = Player.getPlayerList();
   // Gson gson = new Gson();

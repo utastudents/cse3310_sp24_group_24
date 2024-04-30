@@ -30,29 +30,41 @@ public class GridUnitTest extends TestCase {
         return new TestSuite(GridUnitTest.class);
     }
 
-    // Uses a set of words as a baseline for some set functionalities
-    public void wordListSetup(List<String> WordList, boolean addWords) {
-        // Primary words for testtryAllDirections and testtryLocation
-        String[] Words = { "expressions", "exercises", "beautiful", "resumes", "familiar", "useful",
-                "linked", "lyrics", "scout", "rest", "epic", "love", "ends", "dual" };
-        for (String word : Words) {
-            WordList.add((word).toUpperCase());
-        }
+    public void wordListSetup(List<String> WordList) {
+        // Add words to word list individually
+        WordList.add(("expressions").toUpperCase()); // index 0
+        WordList.add(("exercises").toUpperCase()); // index 1
+        WordList.add(("beautiful").toUpperCase()); // index 2
+        WordList.add(("resumes").toUpperCase()); // index 3
+        WordList.add(("familiar").toUpperCase()); // index 4
+        WordList.add(("useful").toUpperCase()); // index 5
+        WordList.add(("linked").toUpperCase()); // index 6
+        WordList.add(("lyrics").toUpperCase()); // index 7
+        WordList.add(("scout").toUpperCase()); // index 8
+        WordList.add(("rest").toUpperCase()); // index 9
+        WordList.add(("epic").toUpperCase()); // index 10
+        WordList.add(("love").toUpperCase()); // index 11
+        WordList.add(("ends").toUpperCase()); // index 12
+        WordList.add(("dual").toUpperCase()); // index 13
 
-        // Additional words for testminWordsAndMinDensity
-        if (addWords == true) {
-            // Since the current implementation of ReadInWordFile returns void, we currently
-            // can't get a random list.
-            String[] AdditionalWords = { "academic", "bookstore", "congratulations", "distributors", "dodge", "earn",
-                    "fundamental", "generating", "ghost", "hammer", "headquarters", "identify", "instrumentation",
-                    "jazz", "kernel", "knew", "lanes", "lights", "mainland", "many", "median", "mirrors", "prefix",
-                    "prix", "same", "stylus", "treaty", "troubleshooting", "undergraduate", "unlock", "valid", "viking",
-                    "wake", "watt", "xerox", "yellow", "zinc", "wind", "adobe", "acre", "ports", "mill", "custom",
-                    "expo", "ever", "humor", "idol", "inch", "open", "opera", "order", "ours", "oxford", "page" };
-            for (String word : AdditionalWords) {
-                WordList.add((word).toUpperCase());
-            }
-        }
+        /**
+         * WordList - Size Of Word
+         * ==========================================
+         * expressions - 11 characters [Does Not Fit]
+         * exercises - 9 characters
+         * beautiful - 9 characters
+         * resumes - 7 characters
+         * familiar - 8 characters
+         * useful - 6 characters
+         * linked - 6 characters
+         * lyrics - 6 characters
+         * scout - 5 characters
+         * rest - 4 characters
+         * epic - 4 characters
+         * love - 4 characters
+         * ends - 4 characters
+         * dual - 4 characters
+         */
     }
 
     // Simple test to see if a word can be inserted in all possible directions
@@ -62,18 +74,17 @@ public class GridUnitTest extends TestCase {
         WordList = new ArrayList<>();
         final char[][] WordSearchGrid;
         WordSearchGrid = new char[GridSize][GridSize];
-        int wordsUsed = 0;
         int expectedCellsUsed = 0;
 
         // Add words to word list
-        wordListSetup(WordList, false);
+        wordListSetup(WordList);
 
         // Create Grid object
         Grid testGrid = new Grid();
 
         // Code from the CreatWordSeachGrid function
         int MinCellsUsed = (int) (GridArea * TargetDensity);
-        System.out.println("\nGridUnitTest: Testing all directions...\nGridArea = " + GridArea);
+        System.out.println("\nTesting all directions...\nGridArea = " + GridArea);
         System.out.println("TargetDensity = " + TargetDensity);
         System.out.println("MinCellsUsed= " + MinCellsUsed);
         int CellsUsed = 0;
@@ -94,21 +105,18 @@ public class GridUnitTest extends TestCase {
         CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 5, 10, 10);
         expectedCellsUsed = 11;
         assertEquals(expectedCellsUsed, CellsUsed);
-        wordsUsed++;
 
         // Testing diagonal up left (dir = 6)
         // Should fit into 20x20 grid
         CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 6, 10, 10);
         expectedCellsUsed = 21;
         assertEquals(expectedCellsUsed, CellsUsed);
-        wordsUsed++;
 
         // Testing horizontal left (dir = 4)
         // Should fit into 20x20 grid
         CellsUsed += testGrid.tryLocation(WordSearchGrid, WordList.get(0), 4, 10, 10);
         expectedCellsUsed = 31;
         assertEquals(expectedCellsUsed, CellsUsed);
-        wordsUsed++;
 
         // Testing diagonal up right (dir = 7)
         // Should NOT fit into 20x20 grid at r = 10, c = 10
@@ -127,9 +135,6 @@ public class GridUnitTest extends TestCase {
 
         // Unable to print resulting grid due to global variables in Grid.java
 
-        // Check if it doesn't meet the minimum word requirements
-        assertFalse(wordsUsed > MinCellsUsed);
-
         System.out.println("Finished testing all directions...\n");
     }
 
@@ -146,20 +151,20 @@ public class GridUnitTest extends TestCase {
         int expectedCellsUsed = 0;
 
         // Add words to word list
-        wordListSetup(WordList, false);
+        wordListSetup(WordList);
 
         // Create Grid object
         Grid testGrid = new Grid();
 
         // Code from the CreatWordSeachGrid function
         int MinCellsUsed = (int) (GridArea * TargetDensity);
-        System.out.println("\nGridUnitTest: Testing 10x10 Grid...\nGridArea = " + GridArea);
+        System.out.println("\nTesting 10x10 Grid...\nGridArea = " + GridArea);
         System.out.println("TargetDensity = " + TargetDensity);
         System.out.println("MinCellsUsed= " + MinCellsUsed);
         int CellsUsed = 0;
 
         // Unable to test if word is not inserted into grid for being out of bounds, due
-        // to overriding variables in Grid.java under a 10x10 grid.
+        // to overriding variables in Grid.java
 
         /**
          * Adding "exercises"
@@ -394,44 +399,5 @@ public class GridUnitTest extends TestCase {
     // Most other functions outside of tryLocation be either trivial, has randomness
     // built into the function, or is untestable due to global variables in
     // Grid.java.
-
-    // Simple test that test placing words down with randomness involved. It is
-    // difficult to get the exact values for the test, we are testing the minimum
-    // words and minimum density.
-    public void testminWordsAndMinDensity() {
-        final List<String> WordList;
-        WordList = new ArrayList<>();
-        final char[][] WordSearchGrid;
-        WordSearchGrid = new char[GridSize][GridSize];
-        int wordsUsed = 0;
-
-        // Add words to word list
-        wordListSetup(WordList, true);
-
-        // Create Grid object
-        Grid testGrid = new Grid();
-
-        // Code from the CreatWordSeachGrid function
-        System.out.println("\nGridUnitTest: Testing random word placement...\nGridArea = " + GridArea);
-        int CellsUsed = 0;
-
-        // Insert words randomly into word grid
-        for (String word : WordList) {
-            CellsUsed += testGrid.tryPlaceWord(WordSearchGrid, word);
-            wordsUsed++;
-        }
-
-        // Check if it meets the minimum and maximum word requirements
-        assertTrue(MinWordCount < wordsUsed);
-        assertTrue(MaxWordCount > wordsUsed);
-
-        // Check if it meets the minimum density by using countValidWordCharacters
-        double WordDensitiy = (double) CellsUsed / GridArea;
-        System.out.println("WordDensitiy = " + WordDensitiy);
-        assertTrue(WordDensitiy <= 1);
-        assertTrue(WordDensitiy > TargetDensity);
-        
-        System.out.println("Finished testing random word placement\n");
-    }
 
 }

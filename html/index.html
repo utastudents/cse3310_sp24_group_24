@@ -28,9 +28,9 @@
         <div class="container">
             <div class="left-column">
                 <div class="box">
-                    <h1 class="header_text">Nick Handles</h1>
+                    <h1 class="header_text">Nicknames</h1>
                     <ol id="playerNick" class="player-nick"></ol>
-                    <button id="button" onclick="readyqueue()">Join Queue</button>
+                    <button id="button" onclick="EnterQueue()">Join Queue</button>
                 </div>
                 <div class="box">
                     <h1 class="header_text">Leaderboard</h1>
@@ -56,7 +56,7 @@
                 </div>
                 <div class="box">
                     <h1 class="header_text">Start Game With</h1>
-                    <button id="startButton" onclick="startGame()"> Begin</button>
+                    <button id="startButton" onclick="TryToStartGame()"> Begin</button>
                 </div>
             </div>
         </div>
@@ -88,6 +88,7 @@
        
     </div>
 </body>
+
     <script>
         // Establish WebSocket connection when the page loads
         var serverUrl;
@@ -98,109 +99,14 @@
 
         socket.onopen = function() {
             console.log('Connected to server');
+
+            //Hide the lobby and game classes
             const lobbyPage = document.querySelector(".lobby-page");
             lobbyPage.style.display = "none";
             const gamePage = document.querySelector(".game-page");
             gamePage.style.display = "none";
-            /*
-            const gamePage = document.querySelector(".game-page");
-            gamePage.style.display = "none";
-            let storedPlayerNames = localStorage.getItem('playerNames');
-            playerNames = storedPlayerNames ? JSON.parse(storedPlayerNames) : [];
-
-            const playerName = localStorage.getItem('playerName');
-            if (playerName) {
-            socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-            console.log("sending " + JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-            displayNick(playerName, playerNames);
-
-            // Store the updated list of player names in localStorage
-            localStorage.setItem('playerNames', JSON.stringify(playerNames));
-            }
-            */
-           
         };
         
-
-        document.getElementById('nameForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const playerName = document.getElementById("playerName").value; 
-            if (playerName.trim() !== "")
-            {
-                var allPlayersnames = document.querySelector("#playerNick");
-                for (var i = 0; i < allPlayersnames.length; i++)
-                {
-                    alert("Name already in use. Try again");
-                    return;
-                }
-            }
-        
-            displayNick(playerName, playerNames);
-            Lobby_display();
-
-            //playerNames.push(playerName);
-            //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-            //sessionStorage.setItem('playerName', playerName);
-            //console.log('Player names:', playerNames);
-            socket.send(JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
-            console.log("sending " + JSON.stringify({ Type: 'newPlayer', playerName: playerName,"ConnectionID":ConnectionID }));
-            //Lobby_display();
-
-
-            if (playerName) {
-                // Auto 0 to the new player
-                const startScore = 0;
-                
-                // Add the player
-                updateLeaderboard(playerName, startScore);
-            }
-        });
-      
-
-
-        
-        function Lobby_display() {
-            const landingPage = document.querySelector(".landing-page");
-            const lobbyPage = document.querySelector(".lobby-page");
-            const gamePage = document.querySelector(".game-page");
-            landingPage.style.display = "none";
-            lobbyPage.style.display = "block";
-            gamePage.style.display = "none";
-
-            //const playerName = ""; //sessionStorage.getItem('playerName');
-            if (playerName) {
-            // Display the player name in the lobby
-            displayNick(playerName, playerNames);
-
-        // Send a message to the server indicating that the player has joined the lobby
-            socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-            console.log(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-        // Store the updated list of player names back to sessionStorage
-            //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-    }
-}
-
-    
-           /* if (lobbyPage.style.display === "none") {
-                lobbyPage.style.display = "flex";
-                landingPage.style.display = "none"; // Hide the landing page
-            }*/
-    
-    
-
-        const playerName = "";//sessionStorage.getItem('playerName');
-            if (playerName) {
-                socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-                console.log("sending "+JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
-                displayNick(playerName, playerNames);
-
-                // Store the updated list of player names back to sessionStorage
-                //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-            }
-        
-    
-        ConnectionID=-1;
-
         socket.onmessage = function(event) {
             console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
@@ -222,6 +128,12 @@
                 ConnectionID = message.ConnectionID;
                 console.log("my connection id is " + ConnectionID);
                 break;
+            case 'Lobby':
+                console.log("Lobby Message Recieved");
+                console.log(message.players);
+                updatePlayerList(message.players);
+                UpdateQueue(message.readyQueue);
+                break;
             case 'sender':
                 updatePlayerList(message.players);
                 if ('sender' in message) {
@@ -229,14 +141,70 @@
                 }
                 break;
             default:
-                console.log("Unkown message")
+                console.log("Unknown message")
                 break;
         }
 
 };
-    
         
+        //When the submit button is pressed for name and color
+        document.getElementById('nameForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const playerName = document.getElementById("playerName").value; 
+            const playerColor = document.getElementById("playerColor").value;
 
+            if (playerName.trim() !== "")
+            {
+                var allPlayersnames = document.querySelector("#playerNick");
+
+                //Checking if the name is already taken 
+                
+                for (var i = 0; i < allPlayersnames.length; i++)
+                {
+                    alert("Name already in use. Try again");
+                    return;
+                }
+                
+            }
+        
+            Lobby_display();
+
+            playerNames.push(playerName);
+            //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
+            //sessionStorage.setItem('playerName', playerName);
+            //console.log('Player names:', playerNames);
+            socket.send(JSON.stringify({type: 'newPlayer', playerName: playerName, playerColor: playerColor, "ConnectionID":ConnectionID }));
+            console.log("sending " + JSON.stringify({type: 'newPlayer', playerName: playerName, playerColor: playerColor, "ConnectionID":ConnectionID }));
+            //Lobby_display();
+
+            if (playerName) {
+                // Auto 0 to the new player
+                const startScore = 0;
+                
+                // Add the player
+                updateLeaderboard(playerName, startScore);
+            }
+        });
+
+        function Lobby_display() {
+            const landingPage = document.querySelector(".landing-page");
+            const lobbyPage = document.querySelector(".lobby-page");
+            const gamePage = document.querySelector(".game-page");
+            landingPage.style.display = "none";
+            lobbyPage.style.display = "block";
+            gamePage.style.display = "none";
+
+        }
+
+        const playerName = "";//sessionStorage.getItem('playerName');
+            if (playerName) {
+                socket.send(JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+                console.log("sending "+JSON.stringify({ sender: playerName, content: 'has joined the lobby' }));
+               
+            }
+        
+        ConnectionID=-1;
+    
         socket.onclose = function() {
             console.log('WebSocket connection closed');
             displayMessage("Server connection closed", "bot-message");
@@ -268,26 +236,6 @@
             chatbox.scrollTop = chatbox.scrollHeight; // Keep the chat scrolled to the bottom
         }
 
-        
-        function displayNick(playerName, playerNames) {
-    // Get the element where player names are displayed
-            const playerNick = document.getElementById('playerNick');
-    // Create a new list item for the new player's name
-            const li = document.createElement('li');
-            li.textContent = playerName;
-    //font size
-            li.style.fontSize = "20px"; 
-
-    // Append the new player's name to the list of player names displayed in the lobby
-            playerNick.appendChild(li);
-    // Add the new player's name to the list of player names
-            playerNames.push(playerName);
-    // Update the session storage with the updated list of player names
-            //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
-    
-    // Send the updated list of player names to the server
-            socket.send(JSON.stringify({ playerNames: playerNames }));
-        }
         function updatePlayerList(players) {
             const playerNick = document.getElementById('playerNick');
             playerNick.innerHTML = ''; // Clear the existing player list
@@ -295,8 +243,9 @@
             // Add each player to the player list in the HTML
              players.forEach(player => {
                 const li = document.createElement('li');
-                li.textContent = player;
-                 playerNick.appendChild(li);
+                li.textContent = player.PlayerName;
+                li.style.color = player.PlayerColor
+                playerNick.appendChild(li);
                 });
             }
 
@@ -311,75 +260,50 @@
             }
         }
 
-        function startGame() {
+        function TryToStartGame(){
+            const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
             const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
-            
 
-            
+            for (var i = 0; i < playerNickItems.length; i++){
+                if(playerNickItems[i].textContent !== playerName){
+                    socket.send("GamePlayer " + playerName + " " + playerNickItems[i].textContent + " ");
+                    console.log("sending " + "GamePlayer " + playerName + " " + playerNickItems[i].textContent + " ");
+                    break;
+                }
+            }
+            startGame();
+   
+        }
+
+        function startGame() {
             const lobbyPage = document.querySelector(".lobby-page");
             const landingPage = document.querySelector(".landing-page");
             const gamePage = document.querySelector(".game-page");
             lobbyPage.style.display = "none";
             landingPage.style.display = "none";
             gamePage.style.display = "block";
-            
-            
-
-            
-            if (playerNickItems.length > 0) {
-                const firstPlayer = playerNickItems[0].textContent;
-                alert(firstPlayer + " has started the game!");
-            } else {
-                alert("No players in the lobby yet!");
-            }
         }
-        /*
-        function readyqueue() {
-            const playerNick = "";//sessionStorage.getItem('playerName');
-            if (playerNick) {
-                //displayNick(playerNick, playerNames);
-                const playerQueue = document.getElementById('playerQueue');
-                const li = document.createElement('li');
-                li.textContent = playerNick;
-                playerQueue.appendChild(li);
-                // Send the player nick to the server
-                playerNames.push(playerName);
-                socket.send(JSON.stringify({ playerNick: playerName }));
-            } else {
-                console.error('Player name not found.');
-            }
-        }
-        */
-        function readyqueue() {
-            var playerExistInQueue = 0;
+        
+        function EnterQueue() {
             const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
-            for(i = 0; i <= playerNames.length; i++) {
-                if (playerName==playerNames[i]) {
-                    playerExistInQueue = 1;
-                    break;
-                }
-            }
-
-            if (playerExistInQueue){
-                /* Player exists and is in queue. */
-                console.error('Player name already in the ready queue.');
-            } else {
-                /* Player doesn't exists, check if name is found. */
-                if (playerName) {
-                    const playerQueue = document.getElementById('playerQueue');
-                    const li = document.createElement('li');
-                    li.textContent = playerName; // Use the player's name obtained from the input field
-                    li.style.fontSize = "20px"; 
-                    playerQueue.appendChild(li);
-                } else {
-                    /* Player doesn't exists, and name is not found. */
-                    console.error('Player name not found.');
-                }
-            }
-
             
+            socket.send(JSON.stringify({type: 'readyPlayer', playerName: playerName}));
+            console.log("sending " + JSON.stringify({type: 'readyPlayer', playerName: playerName}));
         }
 
+        function UpdateQueue(players) {
+            const playerQueue = document.getElementById('playerQueue');
+            playerQueue.innerHTML = ''; // Clear the existing player list
+
+            // Add each player to the player list in the HTML
+             players.forEach(player => {
+                const li = document.createElement('li');
+                li.textContent = player.PlayerName;
+                li.style.color = player.PlayerColor
+                li.style.fontSize = "15px";
+                playerQueue.appendChild(li);
+                });
+        }
 
 
         let leaderboardData = [];
@@ -418,6 +342,7 @@
             });
         }
 
+        //#region GRID CODE
         function generateTable(arrayData) {
         var table = '<table border="1" id="WordGrid" >';
             for (var i = 0; i < arrayData.length; i++) {
@@ -533,130 +458,8 @@
         rIndexTwo = -1;
         cIndexOne = -1;
         cIndexTwo = -1;
-        
+        //#endregion     
     }
-
-    
-
-        function generateTable(arrayData) {
-        var table = '<table border="1" id="WordGrid" >';
-            for (var i = 0; i < arrayData.length; i++) {
-                table += '<tr onclick="clickFunctionRow(this)">';
-                for (var j = 0; j < arrayData[i].length; j++) {
-                    //table += '<td>' + arrayData[i][j] + '</td>';
-                    table += '<td onclick="clickFunctionCol(this)">' + arrayData[i][j] + '</td>';
-                }
-                table += '</tr>';
-            }
-        table += '</table>';
-        return table;
-    }
-
-    //Generates the list of words for the word bank
-    function generateWordBank(arrayData) {
-        var table = '<ul id=WordBank>';
-            for (var i = 0; i < arrayData.length; i++) {
-                table += '<li>' + arrayData[i] + '</li>'
-            }
-        table += '</ul>';
-        return table;
-    }
-
-    //Puts the generated table into the container for word search
-    function displayWordSearch(arrayData) {
-        var container = document.getElementById('table-container');
-        container.innerHTML = generateTable(arrayData);
-    }
-
-    //Puts the generated list into the container for word bank
-    function displayWordBank(arrayData) {
-        var container = document.getElementById('answer-container');
-        container.innerHTML = generateWordBank(arrayData);
-    } 
-
-    var rIndexOne = -1;
-    var rIndexTwo = -1;
-    var cIndexOne = -1;
-    var cIndexTwo = -1;
-    
-
-    function clickFunctionCol(x){
-        console.log("column = " + x.cellIndex);
-
-        if(cIndexOne == -1){
-            cIndexOne = x.cellIndex;
-        }else{
-            cIndexTwo = x.cellIndex;
-        }
-    }
-
-    function clickFunctionRow(x){
-        console.log("row = " + x.rowIndex);
-        var WordGrid = document.getElementById('WordGrid');
-        
-
-        if(rIndexOne == -1){
-            rIndexOne = x.rowIndex;
-            var row = WordGrid.rows[rIndexOne];
-            var cell = row.cells[cIndexOne];
-            //cell.classList.toggle('selected');
-            cell.style.backgroundColor = localStorage.getItem('playerColor');
-        }else{
-            rIndexTwo = x.rowIndex;
-            checkWord();
-        }
-    }
-
-    function checkWord(){
-        console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
-        socket.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
-    }
-
-    function crossOutWord(FoundWordIndex){
-        var WordGrid = document.getElementById('WordGrid');
-        var ColDiff = (cIndexTwo - cIndexOne);
-        var RowDiff = (rIndexTwo - rIndexOne);
-        var row = WordGrid.rows[rIndexOne];
-        var cell = row.cells[cIndexOne];
-        
-        if(FoundWordIndex != -1){
-            //Cross Out Word in wordbank IF found word was correct
-            var wordBank = document.getElementById('WordBank');
-            wordBank.children[FoundWordIndex].classList.add('crossed-out');
-            
-            //Create line of highlighted boxes to fill out the whole word
-            for(var i = 0; i < Math.max(Math.abs(ColDiff), Math.abs(RowDiff)); i++){
-                if(RowDiff < 0){
-                    row = WordGrid.rows[rIndexOne -= 1];
-                }
-                if(RowDiff > 0){
-                    row = WordGrid.rows[rIndexOne += 1];
-                }
-                if(ColDiff < 0)
-                {
-                    cell = row.cells[cIndexOne -= 1];
-                }
-                if(ColDiff > 0){
-                    cell = row.cells[cIndexOne += 1];
-                }
-                cell.style.backgroundColor = localStorage.getItem('playerColor');
-            }
-            
-        }else{
-            //If FoundWordIndex was -1 that means no correct word was found so selected sqaure goes back 
-            //to default color
-            cell.style.backgroundColor = "cadetblue";
-        }
-
-        //Reset the index variables
-        rIndexOne = -1;
-        rIndexTwo = -1;
-        cIndexOne = -1;
-        cIndexTwo = -1;
-        
-    }
-
-    
 
     </script>
 </html>
