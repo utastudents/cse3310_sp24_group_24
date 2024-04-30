@@ -9,7 +9,6 @@ public class Lobby {
     private PlayerType gameController; // Added field to track game controller
     private final int MAX_PLAYERS_PER_GAME = 4; // Maximum players per game
     private String type = "Lobby";
-    private Leaderboard leaderboard; // Added field for the leaderboard;
 
     public Lobby() {
         players = new ArrayList<>();
@@ -33,7 +32,6 @@ public class Lobby {
         }
 
         players.add(player);
-        //leaderboard.addPlayer(player);
     }
 
     public synchronized void removePlayer(Player player) {

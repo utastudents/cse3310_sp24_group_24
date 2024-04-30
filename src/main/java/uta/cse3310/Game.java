@@ -10,7 +10,6 @@ public class Game {
     
     public Grid grid;
     
-
     public String[] Msg;
     public int GameId;
     public Statistics Stats;
