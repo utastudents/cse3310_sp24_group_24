@@ -153,7 +153,8 @@ public class App extends WebSocketServer {
   }
 
   @Override
-  public void onMessage(WebSocket conn, String message) {
+  public void onMessage(WebSocket conn, String message) 
+  {
     System.out.println("Received message from client: " + message);
 
     // Parse the incoming message to extract sender and content
@@ -190,15 +191,14 @@ public class App extends WebSocketServer {
       String sender = mO.getSender();
       String content = mO.getContent();
       System.out.println(sender + " : " + content);
-      if ("playerNick".equals(mO.getContent()))
-        ;
+      if ("playerNick".equals(mO.getContent()));
       {
         String chatMessage = sender + ":" + content;
         String jsonMessage = gson.toJson(new Message(player, content));
         broadcast(chatMessage);
         // broadcast(message);
-
       }
+      
     }
     // if (message.contains("content")) {
     // Use JSON parsing to extract sender and content
@@ -233,7 +233,8 @@ public class App extends WebSocketServer {
       // since the lobby has changed, let's send it out to everyone
 
       String jsonString = gson.toJson(L);
-      broadcast(jsonString);
+      conn.send(jsonString);
+      //broadcast(jsonString);
       // Player.printPlayerList();
       // broadcastPlayerList();
       // }
