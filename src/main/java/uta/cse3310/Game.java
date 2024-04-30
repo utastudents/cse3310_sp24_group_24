@@ -19,6 +19,7 @@ public class Game {
         Stats = s;
         Button = new PlayerType[9];
         
+        
         grid = new Grid();
         
         // initialize it
@@ -33,16 +34,6 @@ public class Game {
         //Msg[1] = "";
         Msg[0] = "THE WORD SEARCH GAME";
         Msg[1] = "THE WORD SEARCH GAME";
-    }
-
-    public void SetBoard(PlayerType p, int[] b) {
-        // this method is only used for testing purposes
-        // p is the player to give the square to, and b
-        // is an array of button numbers
-        for (int i : b) {
-            Button[i] = p;
-        }
-
     }
 
     public void StartGame() {

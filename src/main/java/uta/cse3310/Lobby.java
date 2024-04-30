@@ -56,7 +56,7 @@ public class Lobby {
     }
 
     public synchronized void addToReadyQueue(Player player) {
-        if (!readyQueue.contains(player)) {
+        if (!(readyQueue.contains(player))) {
             readyQueue.add(player);
         }
         // Start the game if the game controller is ready and there are enough players

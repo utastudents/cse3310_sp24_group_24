@@ -351,16 +351,30 @@
         }
         */
         function readyqueue() {
+            var playerDoesExist = 0;
             const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
-            if (playerName) {
-                const playerQueue = document.getElementById('playerQueue');
-                const li = document.createElement('li');
-                li.textContent = playerName; // Use the player's name obtained from the input field
-                li.style.fontSize = "20px"; 
-                playerQueue.appendChild(li);
+            for(i = 0; i < playerNames.length; i++) {
+                if ((playerName!=playerNames[i]) && (i == playerNames.length)) {
+                    const playerQueue = document.getElementById('playerQueue');
+                    const li = document.createElement('li');
+                    li.textContent = playerName; // Use the player's name obtained from the input field
+                    li.style.fontSize = "20px"; 
+                    playerQueue.appendChild(li);
+                    playerDoesExist = 1;
+                    break;
+                } else if (playerName==playerNames[i]) {
+                    console.error('Player name already in the ready queue.');
+                    break;
+                }
+            }
+
+            if (!playerDoesExist){
+                /* Player exists and is in queue. */
             } else {
                 console.error('Player name not found.');
             }
+
+            
         }
 
 
