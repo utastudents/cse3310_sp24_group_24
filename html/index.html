@@ -351,28 +351,30 @@
         }
         */
         function readyqueue() {
-            var playerDoesExist = 0;
+            var playerExistInQueue = 0;
             const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
             for(i = 0; i <= playerNames.length; i++) {
-                if ((playerName!=playerNames[i]) && (i == playerNames.length)) {
+                if (playerName!=playerNames[i]) {
+                    playerExistInQueue = 1;
+                    break;
+                }
+            }
+
+            if (playerExistInQueue){
+                /* Player exists and is in queue. */
+                console.error('Player name already in the ready queue.');
+            } else {
+                /* Player doesn't exists, check if name is found. */
+                if (playerName) {
                     const playerQueue = document.getElementById('playerQueue');
                     const li = document.createElement('li');
                     li.textContent = playerName; // Use the player's name obtained from the input field
                     li.style.fontSize = "20px"; 
                     playerQueue.appendChild(li);
-                    playerDoesExist = 1;
-                    break;
-                } else if (playerName==playerNames[i]) {
-                    console.error('Player name already in the ready queue.');
-                    playerDoesExist = 1;
-                    break;
+                } else {
+                    /* Player doesn't exists, and name is not found. */
+                    console.error('Player name not found.');
                 }
-            }
-
-            if (!playerDoesExist){
-                /* Player exists and is in queue. */
-            } else {
-                console.error('Player name not found.');
             }
 
             
