@@ -84,6 +84,9 @@ public class App extends WebSocketServer {
 
   private Statistics stats;
 
+  // Version number for the project. For project testing and to meet a requirement for grading.
+  private String versionNumber = "Word Game - v" + System.getenv("VERSION");
+
   public App(int port) {
     super(new InetSocketAddress(port));
 
@@ -116,6 +119,11 @@ public class App extends WebSocketServer {
     String jsonString = gson.toJson(E);
     conn.send(jsonString);
     System.out.println("sending " + jsonString);
+
+    // Add version next to title
+    String version = getVersion();
+    // Some stuff here that converts from GSON to JSON and send it over to the HTML
+    
   }
 
   @Override
@@ -339,6 +347,10 @@ public class App extends WebSocketServer {
     setConnectionLostTimeout(0);
     stats = new Statistics();
     startTime = Instant.now();
+  }
+
+  public String getVersion() {
+    return versionNumber;
   }
 
   private Lobby findAvailableLobby() {
