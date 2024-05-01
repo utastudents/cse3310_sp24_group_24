@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./css/lobby_styles.css">
+<title>WordSearch</title>
+</head>
+<body>
+    <h1 style="text-align: center;"> WORD GAME LOBBY</h1>
+    <div class="container">
+        <div class="left-column">
+        <div class= "box">
+        
+            <h1 class = "header_text"> Nickname</h1>
+            <ol id="playerNick" class="player-nick"></ol>
+            </div>
+    
+            <div class = "box">
+                <h1 class = "header_text"> LeaderBoard</h1>
+            </div>
+            
+        </div>
+    
+
+        <div class="chatbox-container">
+            <div class="chatbox" id="chatbox">
+                <div class="message bot-message">Display Message</div>
+            </div>
+        </div>
+        <div class="right-column">
+        <div class ="box">
+            <h1 class="header_text"> Players Ready</h1>
+            
+            </div>
+        <div class = "box">
+            <h1 class=" header_text"> Waiting for host</h1>
+        </div>
+       </div>
+           
+    </div>
+
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        // Chatbox Script//
+        var socket = null
+        socket = new WebSocket("ws://" + window.location.hostname + ":9880"); // WebSocket server address
+
+        socket.onopen = function (evt) {
+            console.log('Connected to server');
+
+            socket.send(localStorage.getItem('myValue') + " has joined");
+        }
+
+        socket.onclose = function (evt){
+            console.log("Disconnecting... closed");
+        }
+
+        socket.onmessage = function(evt) {
+            const message = event.data;
+            displayMessage(message, "user-message");
+            return false;
+        }
+    
+        function sendMessage() {
+            var userInput = document.getElementById("userInput");
+            var message = userInput.value;
+            var playerName = localStorage.getItem('myValue');
+            var messageWithNick = playerName + ": " + message; // Add user's nick handle to the message
+            socket.send(messageWithNick); // Send message with nick handle to server
+            userInput.value = "";
+        }
+
+        function displayMessage(message, className) {
+            var chatbox = document.getElementById("chatbox");
+            var messageElement = document.createElement("div");
+            // Extract nick handle from the message (assumed format: "NickHandle: Message")
+            var separatorIndex = message.indexOf(":");
+            var nickHandle = message.substring(0, separatorIndex);
+            var messageContent = message.substring(separatorIndex + 1).trim();
+            messageElement.textContent = nickHandle + ": " + messageContent; // Display nick handle with message
+            messageElement.classList.add("message", className);
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll to bottom
+           
+        }
+        // Nicknames/Handles //
+        var playerNames = [];
+        window.onload = function()
+        {
+            var playerName = localStorage.getItem('myValue');
+            addPlayerToList(playerName);
+            displayPlayerNick(playerName);
+        }
+
+        function addPlayerToList(playerName) 
+        {
+            playerNames.push(playerName);
+        }
+
+        function displayPlayerNick(playerName) 
+        {
+            var playerNickContainer = document.getElementById("playerNick");
+            var playerNickElement = document.createElement("li");
+            playerNickElement.textContent = playerName;
+            playerNickContainer.appendChild(playerNickElement);
+            
+        }
+
+        function dislplayReadyPlayer(playerName)
+        {
+
+        }
+        
+    
+        
+       
+    </script>
+</body>
+</html>
