@@ -246,7 +246,7 @@
     
     <div class="game-page">
             <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
-            <div id="time" style="text-align: center; margin-top: 50px;"></div>
+
             <div id="leftbox">
                 <h2 id="player1name"> </h2>
             </div>
@@ -373,7 +373,7 @@
             }
         
             Lobby_display();
-         
+
             playerNames.push(playerName);
             //sessionStorage.setItem('playerNames', JSON.stringify(playerNames));
             //sessionStorage.setItem('playerName', playerName);
@@ -477,52 +477,9 @@
                     break;
                 }
             }
-<<<<<<< HEAD
-            startTime();
-            startGame();
-=======
             
->>>>>>> c923fd920ce7de3c593078138766ec9ec114d2b1
    
         }
-        /*
-        function startTime() {
-            var totalTime = 180; // 3 minutes in game total
-            const timerElement = document.getElementById("time");
-
-            // Update timer
-            const timer = setInterval(() => {
-                const min = Math.floor(totalTime / 60);
-                const sec = totalTime % 60;
-
-                // Display time MM:SS
-                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                totalTime--;
-
-                // Check if time is up
-                if (totalTime < 0) {
-                    clearInterval(timer); // Stop the timer
-                    //Go back to Lobby
-                    const lobbyPage = document.querySelector(".lobby-page");
-                    const gamePage = document.querySelector(".game-page");
-                    lobbyPage.style.display = "block";
-                    gamePage.style.display = "none";
-                    //Tell user time is up
-                    alert("Time's up! You are being sent back to the lobby.");
-                }
-            }, 1000); 
-        }
-        */
-        function startTime() {
-            setTimeout(() => {
-                const lobbyPage = document.querySelector(".lobby-page");
-                const gamePage = document.querySelector(".game-page");
-                lobbyPage.style.display = "block";
-                gamePage.style.display = "none";
-                alert("Time's up! You are being sent back to the lobby.");
-            }, 180000); //3 minutes
-       }
 
         function startGame() {
             const lobbyPage = document.querySelector(".lobby-page");
