@@ -248,7 +248,7 @@
             <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
 
             <div id="leftbox">
-                <h2> Player 1 Name </h2>
+                <h2 id="player1name"> </h2>
             </div>
 
             <div id="centerbox">
@@ -262,7 +262,7 @@
             </div>
     
             <div id="rightbox">
-                <h2> Player 2 Name</h2>
+                <h2 id="player2name"> </h2>
             </div>
        
     </div>
@@ -301,7 +301,20 @@
                 break;  
             case 'FoundWord':
                 console.log("FoundWord recieved");
-                crossOutWord(message.FoundWordIndex)
+                var playerName = document.getElementById("playerName").value; 
+                var playerColor = document.getElementById("playerColor").value; 
+                if(playerName === message.player1.PlayerName || playerName === message.player2.PlayerName){
+                    playerName = message.FindersName;
+                    if(playerName === message.player1.PlayerName){
+                        playerColor = message.player1.PlayerColor;
+                    }else{
+                        playerColor = message.player2.PlayerColor;
+                    }
+
+                    crossOutWord(message.FoundWordIndex, message.cIndex1, message.rIndex1, message.cIndex2, message.rIndex2, playerColor);
+                    //FUNCTION TO ADD FOUND WORD TO SIDE LISTS
+                }
+                
                 break;   
             case 'ID':
                 ConnectionID = message.ConnectionID;
@@ -312,6 +325,19 @@
                 console.log(message.players);
                 updatePlayerList(message.players);
                 UpdateQueue(message.readyQueue);
+                break;
+            case 'Game':
+                console.log("Game Message Recieved");
+                var playerName = document.getElementById("playerName").value; 
+                var player1nameheader = document.getElementById("player1name");
+                var player2nameheader = document.getElementById("player2name");
+                if(playerName === message.player1.PlayerName || playerName === message.player2.PlayerName){
+                    displayWordSearch(message.grid);
+                    displayWordBank(message.WordsUsed);
+                    startGame();
+                    player1nameheader.innerHTML = message.player1.PlayerName;
+                    player2nameheader.innerHTML = message.player2.PlayerName;
+                }
                 break;
             case 'sender':
                 updatePlayerList(message.players);
@@ -451,7 +477,7 @@
                     break;
                 }
             }
-            startGame();
+            
    
         }
 
@@ -578,8 +604,8 @@
     function clickFunctionRow(x){
         console.log("row = " + x.rowIndex);
         var WordGrid = document.getElementById('WordGrid');
-        var playerColor = document.getElementById("playerColor").value
-
+        var playerColor = document.getElementById("playerColor").value;
+        var playerName = document.getElementById("playerName").value;
         if(rIndexOne == -1){
             rIndexOne = x.rowIndex;
             var row = WordGrid.rows[rIndexOne];
@@ -587,46 +613,47 @@
             cell.style.backgroundColor = playerColor;
         }else{
             rIndexTwo = x.rowIndex;
-            checkWord();
+            checkWord(playerName);
         }
     }
 
-    function checkWord(){
+    function checkWord(playerName){
         console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
-        socket.send("WordCheck" + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") ");
+        socket.send("WordCheck" + " " + playerName + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") " + cIndexOne + " " + rIndexOne + " " + cIndexTwo + " " + rIndexTwo + " ");
     }
 
-    function crossOutWord(FoundWordIndex){
+    function crossOutWord(FoundWordIndex, cIndex1, rIndex1, cIndex2, rIndex2, playerColor){
         var WordGrid = document.getElementById('WordGrid');
-        var playerColor = document.getElementById("playerColor").value
-        var ColDiff = (cIndexTwo - cIndexOne);
-        var RowDiff = (rIndexTwo - rIndexOne);
-        var row = WordGrid.rows[rIndexOne];
-        var cell = row.cells[cIndexOne];
+        
+        
+        var ColDiff = (cIndex2 - cIndex1);
+        var RowDiff = (rIndex2 - rIndex1);
+        var row = WordGrid.rows[rIndex1];
+        var cell = row.cells[cIndex1];
         
         if(FoundWordIndex != -1){
             //Cross Out Word in wordbank IF found word was correct
             var wordBank = document.getElementById('WordBank');
             wordBank.children[FoundWordIndex].classList.add('crossed-out');
             
+            
             //Create line of highlighted boxes to fill out the whole word
             for(var i = 0; i < Math.max(Math.abs(ColDiff), Math.abs(RowDiff)); i++){
-                console.log("coldiff = " + ColDiff);
-                console.log("rowdiff = " + RowDiff);
+                cell.style.backgroundColor = playerColor;
                 if(RowDiff < 0){
-                    row = WordGrid.rows[rIndexOne -= 1];
+                    row = WordGrid.rows[rIndex1 -= 1];
                 }
                 if(RowDiff > 0){
-                    row = WordGrid.rows[rIndexOne += 1];
+                    row = WordGrid.rows[rIndex1 += 1];
                 }
                 if(ColDiff < 0)
                 {
-                    cell = row.cells[cIndexOne -= 1];
+                    cell = row.cells[cIndex1 -= 1];
                 }
                 if(ColDiff > 0){
-                    cell = row.cells[cIndexOne += 1];
+                    cell = row.cells[cIndex1 += 1];
                 }
-                    cell = row.cells[cIndexOne];
+                    cell = row.cells[cIndex1];
                 cell.style.backgroundColor = playerColor;
             }
             

@@ -266,47 +266,42 @@ public class App extends WebSocketServer {
         L.removeFromReadyQueue(L.getPlayerByName(name2));
         String jsonString = gson.toJson(L);
         broadcast(jsonString);
-        Game G = new Game(stats);
+        Game G = new Game(L.getPlayerByName(name1), L.getPlayerByName(name2));
         ActiveGames.add(G);
-
-        //THIS PART NEEDS ADJUSTMENTS
-        
-
-        Message GridMessage = new Message(G.grid.WordSearchGrid);
-        String GridJSONString = gson.toJson(GridMessage);
-        conn.send(GridJSONString);
-
-        //Sending WordBank to server
-        Message WordBank = new Message(G.grid.WordsUsed);
-        String WordBankJSONString = gson.toJson(WordBank);
-        conn.send(WordBankJSONString);
+        Message GameMessage = new Message(G.player1, G.player2, G.grid.WordSearchGrid, G.grid.WordsUsed);
+        String GameJSONString = gson.toJson(GameMessage);
+        broadcast(GameJSONString);
       }
     }
   
     if(message.startsWith("WordCheck") == true)
     {
+      //change this next line so it can do multiple games
       Game G = ActiveGames.get(0);
       int j = 0;
       Boolean Found = false;
       StringTokenizer string = new StringTokenizer(message," ");
       string.nextToken(); 
+      String name = string.nextToken();
       String test = string.nextToken();
+      
+
       for (String i : G.grid.WordsUsedLocations)
       {
         if(test.equals(i)){
           System.out.println("ITS ACTUALLY A WORD!");
-          Message FoundWord = new Message(j);
+          Message FoundWord = new Message(j, G.player1, G.player2, Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name);
           String FoundWordJSONString = gson.toJson(FoundWord);
-          conn.send(FoundWordJSONString);
+          broadcast(FoundWordJSONString);
           Found = true;
           break;
         }
         j++;
       }
       if(Found == false){
-        Message FoundWord = new Message(-1);
-        String FoundWordJSONString = gson.toJson(FoundWord);
-        conn.send(FoundWordJSONString);
+        //Message FoundWord = new Message(-1, G.player1, G.player2);
+        //String FoundWordJSONString = gson.toJson(FoundWord);
+        //conn.send(FoundWordJSONString);
       }
   }
   }

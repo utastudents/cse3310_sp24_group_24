@@ -1,46 +1,41 @@
 package uta.cse3310;
 
-//import com.google.gson.Gson;
+import com.google.gson.Gson;
 
 public class Game {
 
-    PlayerType Players;
-    public PlayerType CurrentTurn;
-    public PlayerType[] Button;
+    public Player player1;
+    public Player player2;
     
     public Grid grid;
+    public int GameId = 0;
     
-    public String[] Msg;
-    public int GameId;
-    public Statistics Stats;
+    public Message GridMessage;
+    public String GridJSONString;
+    public Message WordBank;
+    public String WordBankJSONString;
 
-    Game(Statistics s) {
-        Stats = s;
-        Button = new PlayerType[9];
-        
+    public String ServerString;
+
+    Game(Player player1, Player player2) {
+        this.player1 = player1;
+        this.player2 = player2;
+        //Create the grid instance
         grid = new Grid();
-        
-        // initialize it
-       
+        Gson gson = new Gson();
+        GameId++;
 
-        Players = PlayerType.XPLAYER;
-        CurrentTurn = PlayerType.NOPLAYER;
-        // Shown to the user, 0 is XPLAYER
-        // 1 is OPLAYER
-        Msg = new String[2];
-        //Msg[0] = "Waiting for other player to join";
-        //Msg[1] = "";
-        Msg[0] = "THE WORD SEARCH GAME";
-        Msg[1] = "THE WORD SEARCH GAME";
+        Message GridMessage = new Message(grid.WordSearchGrid);
+        //String GridJSONString = gson.toJson(GridMessage);
+        
+        Message WordBank = new Message(grid.WordsUsed);
+        //String WordBankJSONString = gson.toJson(WordBank); 
+        
+        String ServerString = player1.toString();
     }
 
     public void SetBoard(PlayerType p, int[] b) {
-        // this method is only used for testing purposes
-        // p is the player to give the square to, and b
-        // is an array of button numbers
-        for (int i : b) {
-            Button[i] = p;
-        }
+        
 
     }
 
@@ -63,37 +58,8 @@ public class Game {
     }
 
     public void Update(UserEvent U) {
-        // System.out.println("The user event is " + U.PlayerIdx + " " + U.Button);
 
-        if ((CurrentTurn == U.PlayerIdx) && (CurrentTurn == PlayerType.OPLAYER || CurrentTurn == PlayerType.XPLAYER)) {
-            // Move is legitimate, lets do what was requested
-
-            // Note that a button is going to be set for every UserEvent !
-
-            // Is the button not taken by X or O?
-            if (Button[U.Button] == PlayerType.NOPLAYER) {
-                // System.out.println("the button was 0, setting it to" + U.PlayerIdx);
-                Button[U.Button] = U.PlayerIdx;
-                if (U.PlayerIdx == PlayerType.OPLAYER) {
-                    CurrentTurn = PlayerType.XPLAYER;
-                    Msg[1] = "Other Players Move.";
-                    Msg[0] = "Your Move.";
-                } else {
-                    CurrentTurn = PlayerType.OPLAYER;
-                    Msg[0] = "Other Players Move.";
-                    Msg[1] = "Your Move.";
-                }
-            } else {
-                Msg[PlayerToIdx(U.PlayerIdx)] = "Not a legal move.";
-            }
-
-            // Check for winners, losers, and a draw
-
-         
-            }
-        }
-    
-
+    }
     public void Tick() {
         // this function can be called periodically if a
         // timer is needed.
