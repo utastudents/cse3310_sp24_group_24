@@ -75,8 +75,9 @@ public class App extends WebSocketServer {
   private Vector<Game> ActiveGames = new Vector<Game>();
   private List<WebSocket> clients = new ArrayList<>();
   private List<Lobby> activeLobbies = new ArrayList<>();
-
-  private Lobby L;
+  Gson gson = new Gson();
+  public Lobby L = new Lobby();
+  
   private int connectionId = 0;
 
   private Instant startTime;
@@ -100,8 +101,10 @@ public class App extends WebSocketServer {
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
     connectionId++;
-    Lobby L;
-
+    
+    activeLobbies.add(L);
+    //conn.setAttachment(L);
+  
     clients.add(conn);
 
     System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected");
@@ -109,43 +112,22 @@ public class App extends WebSocketServer {
     ServerEvent E = new ServerEvent();
 
     E.ConnectionID = connectionId;
-    Gson gson = new Gson();
+    
     String jsonString = gson.toJson(E);
     conn.send(jsonString);
     System.out.println("sending " + jsonString);
-
-   
-
-    // Player newPlayer = new Player(playerName);
-
-    // Lobby lobby = findAvailableLobby();
-    // if (lobby == null) {
-    // lobby = createNewLobby();
-    // }
-    // lobby.addPlayer(new Player(playerName)); // Add player to the lobby
-
-    // Set the lobby as an attachment to the connection
-    // conn.setAttachment(lobby);
-
-    // Send lobby information to the connected client
-    // Gson gson = new Gson();
-    // String jsonString = gson.toJson(lobby);
-    // conn.send(jsonString);
-    // System.out.println("Sending "+jsonString);
-
-    // Broadcast lobby information to all clients
-    // broadcast(gson.toJson(lobby));
   }
 
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
     System.out.println(conn + " has closed");
-    Lobby lobby = conn.getAttachment();
-    if (lobby != null) {
-      Player player = lobby.getPlayerByName(conn.getAttachment()); // Retrieve player from the lobby
+    if (L != null) {
+      Player player = L.getPlayerByName(conn.getAttachment()); // Retrieve player from the lobby
       if (player != null) {
-        lobby.removePlayer(player); // Remove player from the lobby
+        L.removePlayer(player); // Remove player from the lobby
         clients.remove(conn);
+        String jsonString = gson.toJson(L);
+        broadcast(jsonString);
       }
     }
 
@@ -154,9 +136,8 @@ public class App extends WebSocketServer {
   @Override
   public void onMessage(WebSocket conn, String message) 
   {
-    
+    //Print out received message
     System.out.println("Received message from client: " + message);
-
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
     
@@ -215,10 +196,9 @@ public class App extends WebSocketServer {
     // broadcast(message);
 
     // }
-
-    if (L == null) {
-      L = createNewLobby();
-    }
+      
+    
+    
 
     //Checking if the message is a newPlayer message
     if (message.indexOf("newPlayer") > 0) {
@@ -226,7 +206,7 @@ public class App extends WebSocketServer {
       // Received message from client: {"type":"newPlayer","playerName":"aaaa","ConnectioID":1}
       NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
       System.out.println("The name is: " + N.playerName + ", The Connection ID is: " + N.ConnectionID + ", The color is: " + N.playerColor) ;
-      
+      conn.setAttachment(N.playerName);
       Player P = new Player(N.ConnectionID,N.playerName,0,N.playerColor);
       L.addPlayer(P);
 
@@ -267,6 +247,7 @@ public class App extends WebSocketServer {
         String jsonString = gson.toJson(L);
         broadcast(jsonString);
         Game G = new Game(L.getPlayerByName(name1), L.getPlayerByName(name2));
+        conn.setAttachment(G);
         ActiveGames.add(G);
         Message GameMessage = new Message(G.player1, G.player2, G.grid.WordSearchGrid, G.grid.WordsUsed);
         String GameJSONString = gson.toJson(GameMessage);
@@ -277,7 +258,7 @@ public class App extends WebSocketServer {
     if(message.startsWith("WordCheck") == true)
     {
       //change this next line so it can do multiple games
-      Game G = ActiveGames.get(0);
+      Game G = conn.getAttachment();
       int j = 0;
       Boolean Found = false;
       StringTokenizer string = new StringTokenizer(message," ");
@@ -366,12 +347,6 @@ public class App extends WebSocketServer {
       }
     }
     return null;
-  }
-
-  private Lobby createNewLobby() {
-    Lobby lobby = new Lobby();
-    activeLobbies.add(lobby);
-    return lobby;
   }
 
   private String escape(String S) {
