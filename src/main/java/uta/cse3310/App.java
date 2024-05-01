@@ -130,7 +130,8 @@ public class App extends WebSocketServer {
         broadcast(jsonString);
       }
     }
-
+    Game G = conn.getAttachment();
+    G = null;
   }
 
   @Override
