@@ -26,8 +26,10 @@ public class Message {
         String content;
     }
 
-    public Message(Player sender, String content) {
-        this.sender = sender.getName();
+    
+    public Message(String sender, String content) {
+        this.type = "ChatMessage";
+        this.sender = sender;
         this.content = content;
     }
 

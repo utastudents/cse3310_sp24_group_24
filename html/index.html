@@ -173,11 +173,9 @@
                     gameID = message.gameID;
                 }
                 break;
-            case 'sender':
-                updatePlayerList(message.players);
-                if ('sender' in message) {
+            case 'ChatMessage':
+                console.log("ChatMessage Received")
                 displayMessage(message.sender, message.content);
-                }
                 break;
             default:
                 console.log("Unknown message")
@@ -255,22 +253,21 @@
 
         function sendMessage() {
             const userInput = document.getElementById("userInput");
-            const content = userInput.value.trim();
-            const playerName = document.getElementById("playerName").value.trim(); //sessionStorage.getItem('playerName') || 'Anonymous';
+            var content = userInput.value.trim();
+            const playerName = document.getElementById("playerName").value.trim();
             if (content) {
-                const message = { sender: playerName, content: content };
-                socket.send(JSON.stringify(message));
-                console.log("sending "+JSON.stringify(message));
-                displayMessage(`${playerName}: ${content}`, "user-message");
+                const message = "ChatMessage|" + playerName + "|" + content + "|";
+                socket.send(message);
+                console.log("sending " + message);
                 userInput.value = '';
             }
         }
 
-        function displayMessage(message, className) {
+        function displayMessage(sender, content) {
             const chatbox = document.getElementById("chatbox");
             const messageElement = document.createElement("div");
-            messageElement.textContent = message;
-            messageElement.classList.add("message", className);
+
+            messageElement.textContent = sender + ": " + content;
             chatbox.appendChild(messageElement);
             chatbox.scrollTop = chatbox.scrollHeight; // Keep the chat scrolled to the bottom
         }

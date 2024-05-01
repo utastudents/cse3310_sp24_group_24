@@ -105,7 +105,6 @@ public class App extends WebSocketServer {
 
     connectionId++;
     
-    activeLobbies.add(L);
     //conn.setAttachment(L);
   
     clients.add(conn);
@@ -130,6 +129,7 @@ public class App extends WebSocketServer {
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
     System.out.println(conn + " has closed");
+
     if (L != null) {
       Player player = conn.getAttachment(); // Retrieve player from the lobby
       System.out.println(player.getName() + " has disconnected");
@@ -143,7 +143,7 @@ public class App extends WebSocketServer {
     for(Game i : ActiveGames){
       //WIP
       //will check if the name of the leaver was in an active game 
-      System.out.println("THIS WILL DELETE THE GAME ROOM IF SOMEONE LEAVES AND SEND THEM BACK TO LOBBY ");
+      //THIS WILL DELETE THE GAME ROOM IF SOMEONE LEAVES AND SEND THEM BACK TO LOBBY
       System.out.println(i);
     }
   }
@@ -153,9 +153,20 @@ public class App extends WebSocketServer {
   {
     //Print out received message
     System.out.println("Received message from client: " + message);
+
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
     
+    if (message.startsWith("ChatMessage") == true){
+      StringTokenizer string = new StringTokenizer(message,"|");
+      string.nextToken(); //Get rid of ChatMessage label
+      String sender = string.nextToken();
+      String content = string.nextToken();
+      Message ChatMessage = new Message(sender, content);
+      String ChatMessageJSONString = gson.toJson(ChatMessage);
+      broadcast(ChatMessageJSONString);
+    }
+
     //Checking if the message is a newPlayer message
     if (message.indexOf("newPlayer") > 0) {
       
@@ -241,38 +252,6 @@ public class App extends WebSocketServer {
       }
   }
   }
-  // private void broadcastPlayerList() {
-  // List<String> playerNames = Player.getPlayerList();
-  // Gson gson = new Gson();
-  // String jsonPlayerList = gson.toJson(playerNames);
-  // JsonObject broadcastMessage = new JsonObject();
-  // broadcastMessage.addProperty("type", "playerList");
-  // broadcastMessage.add("players", gson.toJsonTree(playerNames));
-
-  // Send the player list to all connected clients
-  // for (WebSocket client : clients) {
-  // client.send(broadcastMessage.toString());
-  // }
-  // }
-  // broadcast(jsonPlayerList); // Send the player list to all connected clients
-
-  // Construct the broadcast message
-  // String sender = message.getSender();
-  // String content = message.getContent();
-
-  // Broadcast the message to all connected clients
-  /*
-   * public void broadcast(String message)
-   * {
-   * //Message broadcastMessage = new Message(message.sender, message.content);
-   * //String jsonMessage = gson.toJson(broadcastMessage);
-   * //System.out.println("broadcast " + jsonMessage);
-   * //broadcast(jsonMessage);
-   * for (WebSocket client : clients) {
-   * client.send(message);
-   * }
-   * }
-   */
 
   @Override
   public void onMessage(WebSocket conn, ByteBuffer message) {
