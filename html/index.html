@@ -250,6 +250,10 @@
             <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
             <h2 style="text-align: center;" id = "GameID">  </h2>
 
+            <div id="timerDisplay" style="text-align: center;">
+                <span id="minutes">00</span>:<span id="seconds">00</span>
+            </div>
+
             <div id="leftbox">
                 <h2 id="player1name"> </h2>
             </div>
@@ -498,6 +502,39 @@
             lobbyPage.style.display = "none";
             landingPage.style.display = "none";
             gamePage.style.display = "block";
+            startTimer();
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById("timerDisplay");
+            const minutesDisplay = document.getElementById("minutes");
+            const secondsDisplay = document.getElementById("seconds");
+
+            let totalTime = 180; //3 minutes
+            let remainingTime = totalTime;
+
+            const timerInterval = setInterval(() => {
+                //Calculate remaining time in minutes and seconds
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+
+                //Display 
+                minutesDisplay.textContent = minutes < 10 ? "0" + minutes : minutes;
+                secondsDisplay.textContent = seconds < 10 ? "0" + seconds : seconds;
+
+                //Check if time is up
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "00:00"; // Update timer display
+                    const lobbyPage = document.querySelector(".lobby-page");
+                    const gamePage = document.querySelector(".game-page");
+                    lobbyPage.style.display = "block";
+                    gamePage.style.display = "none";
+                    alert("TIME'S UP! YOU ARE BEING SENT BACK TO LOBBY.");
+                }
+
+                remainingTime--;
+            }, 1000); 
         }
         
         function EnterQueue() {
