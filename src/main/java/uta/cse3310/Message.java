@@ -18,6 +18,7 @@ public class Message {
     private int cIndex2;
     private int rIndex2;
     private String FindersName;
+    private int gameID;
 
 
     public Message() {
@@ -55,13 +56,13 @@ public class Message {
         this.FindersName = FindersName;
     }
 
-    public Message(Player player1, Player player2, char[][] grid, List<String> WordsUsed){
+    public Message(Player player1, Player player2, char[][] grid, List<String> WordsUsed, int gameID){
         this.type = "Game";
         this.player1 = player1;
         this.player2 = player2;
         this.grid = grid;
         this.WordsUsed = WordsUsed;
-
+        this.gameID = gameID;
     }
     
     public String getSender() {

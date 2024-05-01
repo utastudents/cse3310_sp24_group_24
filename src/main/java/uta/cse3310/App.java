@@ -83,9 +83,9 @@ public class App extends WebSocketServer {
   private Instant startTime;
 
   private Statistics stats;
-
-  // Version number for the project. For project testing and to meet a requirement for grading.
+   // Version number for the project. For project testing and to meet a requirement for grading.
   private String versionNumber = "Word Game - v" + System.getenv("VERSION");
+
 
   public App(int port) {
     super(new InetSocketAddress(port));
@@ -120,17 +120,19 @@ public class App extends WebSocketServer {
     conn.send(jsonString);
     System.out.println("sending " + jsonString);
 
+    
     // Add version next to title
     String version = getVersion();
     // Some stuff here that converts from GSON to JSON and send it over to the HTML
-    
+
   }
 
   @Override
   public void onClose(WebSocket conn, int code, String reason, boolean remote) {
     System.out.println(conn + " has closed");
     if (L != null) {
-      Player player = L.getPlayerByName(conn.getAttachment()); // Retrieve player from the lobby
+      Player player = conn.getAttachment(); // Retrieve player from the lobby
+      System.out.println(player.getName() + " has disconnected");
       if (player != null) {
         L.removePlayer(player); // Remove player from the lobby
         clients.remove(conn);
@@ -138,8 +140,12 @@ public class App extends WebSocketServer {
         broadcast(jsonString);
       }
     }
-    Game G = conn.getAttachment();
-    G = null;
+    for(Game i : ActiveGames){
+      //WIP
+      //will check if the name of the leaver was in an active game 
+      System.out.println("THIS WILL DELETE THE GAME ROOM IF SOMEONE LEAVES AND SEND THEM BACK TO LOBBY ");
+      System.out.println(i);
+    }
   }
 
   @Override
@@ -150,83 +156,21 @@ public class App extends WebSocketServer {
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
     
-
-    // broadcast the recieved message
-    // broadcast(message);
-    // Player newPlayer = new Player(playerName);
-
-    // Add player to the lobby
-
-    // Set the lobby as anttachment to the connection
-    // conn.setAttachment(lobby);
-
-    // Send lobby information to the connected client
-    // Gson gson = new Gson();
-    // String jsonString = gson.toJson(lobby);
-    // conn.send(jsonString);
-    // System.out.println("Sending "+jsonString);
-
-    // Broadcast lobby information to all clients
-    // broadcast(gson.toJson(lobby));
-    /*
-    if (false) {
-      NewNameEvent N = gson.fromJson(message, NewNameEvent.class);
-      // Lobby lobbys = conn.getAttachment();
-      // Lobby lobby = findAvailableLobby();
-      if (L == null) {
-        L = createNewLobby();
-      }
-      Player player = new Player(N.ConnectionID, N.playerName, 0, "");
-      L.addPlayer(player);
-
-      Message mO = gson.fromJson(message, Message.class);
-      String sender = mO.getSender();
-      String content = mO.getContent();
-      System.out.println(sender + " : " + content);
-      if ("playerNick".equals(mO.getContent()));
-      {
-        String chatMessage = sender + ":" + content;
-        String jsonMessage = gson.toJson(new Message(player, content));
-        broadcast(chatMessage);
-        // broadcast(message);
-      }
-    }
-      */
-    
-    // if (message.contains("content")) {
-    // Use JSON parsing to extract sender and content
-
-    // Message messageObject = gson.fromJson(message, Message.class);
-
-    // Create the chat string
-    // String chatstring = message.sender + ": " + message.content;
-
-    // Broadcast the chat string
-    // broadcast(message);
-
-    // }
-      
-    
-    
-
     //Checking if the message is a newPlayer message
     if (message.indexOf("newPlayer") > 0) {
       
       // Received message from client: {"type":"newPlayer","playerName":"aaaa","ConnectioID":1}
       NewNameEvent N = gson.fromJson(message,NewNameEvent.class);
       System.out.println("The name is: " + N.playerName + ", The Connection ID is: " + N.ConnectionID + ", The color is: " + N.playerColor) ;
-      conn.setAttachment(N.playerName);
       Player P = new Player(N.ConnectionID,N.playerName,0,N.playerColor);
+      conn.setAttachment(P);
       L.addPlayer(P);
 
       // since the lobby has changed, let's send it out to everyone
   
       String jsonString = gson.toJson(L);
-      //conn.send(jsonString);
       broadcast(jsonString);
-      // Player.printPlayerList();
-      // broadcastPlayerList();
-      // }
+    
     }
 
     //Checking if the message is a player readying up
@@ -258,7 +202,7 @@ public class App extends WebSocketServer {
         Game G = new Game(L.getPlayerByName(name1), L.getPlayerByName(name2));
         conn.setAttachment(G);
         ActiveGames.add(G);
-        Message GameMessage = new Message(G.player1, G.player2, G.grid.WordSearchGrid, G.grid.WordsUsed);
+        Message GameMessage = new Message(G.player1, G.player2, G.grid.WordSearchGrid, G.grid.WordsUsed, ActiveGames.size());
         String GameJSONString = gson.toJson(GameMessage);
         broadcast(GameJSONString);
       }
@@ -267,12 +211,14 @@ public class App extends WebSocketServer {
     if(message.startsWith("WordCheck") == true)
     {
       //change this next line so it can do multiple games
-      Game G = conn.getAttachment();
+      
       int j = 0;
       Boolean Found = false;
       StringTokenizer string = new StringTokenizer(message," ");
       string.nextToken(); 
       String name = string.nextToken();
+      int gameNumber = Integer.parseInt(string.nextToken());
+      Game G = ActiveGames.get(gameNumber - 1);
       String test = string.nextToken();
       
 
@@ -291,7 +237,7 @@ public class App extends WebSocketServer {
       if(Found == false){
         Message FoundWord = new Message(-1, G.player1, G.player2,Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name);
         String FoundWordJSONString = gson.toJson(FoundWord);
-        conn.send(FoundWordJSONString);
+        broadcast(FoundWordJSONString);
       }
   }
   }
@@ -351,15 +297,6 @@ public class App extends WebSocketServer {
 
   public String getVersion() {
     return versionNumber;
-  }
-
-  private Lobby findAvailableLobby() {
-    for (Lobby lobby : activeLobbies) {
-      if (!lobby.isFull()) {
-        return lobby;
-      }
-    }
-    return null;
   }
 
   private String escape(String S) {

@@ -4,6 +4,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
         <!-- <title id="demo" onload=" some function in script section for loading the title with the version "> </title>  -->
        <title>Word Game Lobby</title>
     </head>
@@ -246,6 +248,7 @@
     
     <div class="game-page">
             <h1 style="text-align: center;"> WORD SEARCH GAME </h1>
+            <h2 style="text-align: center;" id = "GameID">  </h2>
 
             <div id="leftbox">
                 <h2 id="player1name"> </h2>
@@ -275,6 +278,7 @@
         serverUrl = "ws://" + window.location.hostname +":"+ (parseInt(location.port) + 100);
         var socket = new WebSocket(serverUrl);
         var playerNames = [];
+        var gameID;
 
         socket.onopen = function() {
             console.log('Connected to server');
@@ -284,7 +288,7 @@
             lobbyPage.style.display = "none";
             const gamePage = document.querySelector(".game-page");
             gamePage.style.display = "none";
-
+            
             // Update title to reflect the current version
             // var titleVersion = "  "; // Add the JSON variable for the string
             // document.getElementById("title").innerHTML = titleVersion; // Set the title as the titleVersion
@@ -334,12 +338,15 @@
                 var playerName = document.getElementById("playerName").value; 
                 var player1nameheader = document.getElementById("player1name");
                 var player2nameheader = document.getElementById("player2name");
+                var gameIDheader = document.getElementById("GameID");
                 if(playerName === message.player1.PlayerName || playerName === message.player2.PlayerName){
                     displayWordSearch(message.grid);
                     displayWordBank(message.WordsUsed);
                     startGame();
                     player1nameheader.innerHTML = message.player1.PlayerName;
                     player2nameheader.innerHTML = message.player2.PlayerName;
+                    gameIDheader.innerHTML = message.gameID;
+                    gameID = message.gameID;
                 }
                 break;
             case 'sender':
@@ -621,8 +628,10 @@
     }
 
     function checkWord(playerName){
+        //var gameID = document.getElementById("GameID");
+        console.log("game id = " + gameID);
         console.log("Checking Word at this location: " + cIndexOne, rIndexOne, cIndexTwo, rIndexTwo);
-        socket.send("WordCheck" + " " + playerName + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") " + cIndexOne + " " + rIndexOne + " " + cIndexTwo + " " + rIndexTwo + " ");
+        socket.send("WordCheck" + " " + playerName + " " + gameID + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") " + cIndexOne + " " + rIndexOne + " " + cIndexTwo + " " + rIndexTwo + " ");
     }
 
     function crossOutWord(FoundWordIndex, cIndex1, rIndex1, cIndex2, rIndex2, playerColor){

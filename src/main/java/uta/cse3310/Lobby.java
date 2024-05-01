@@ -36,6 +36,7 @@ public class Lobby {
 
     public synchronized void removePlayer(Player player) {
         players.remove(player);
+        readyQueue.remove(player);
         //if (gameController.equals(player.getPlayerType())) {
             // If the player being removed is the game controller, assign control to the next player
         //    gameController = getNextGameController();
