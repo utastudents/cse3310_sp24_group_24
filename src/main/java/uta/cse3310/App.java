@@ -299,9 +299,9 @@ public class App extends WebSocketServer {
         j++;
       }
       if(Found == false){
-        //Message FoundWord = new Message(-1, G.player1, G.player2);
-        //String FoundWordJSONString = gson.toJson(FoundWord);
-        //conn.send(FoundWordJSONString);
+        Message FoundWord = new Message(-1, G.player1, G.player2,Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name);
+        String FoundWordJSONString = gson.toJson(FoundWord);
+        conn.send(FoundWordJSONString);
       }
   }
   }
