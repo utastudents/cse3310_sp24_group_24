@@ -10,6 +10,15 @@ public class Message {
     private int FoundWordIndex;
     private String sender;
     private String content;
+    private Game game;
+    private Player player1;
+    private Player player2;
+    private int cIndex1;
+    private int rIndex1;
+    private int cIndex2;
+    private int rIndex2;
+    private String FindersName;
+
 
     public Message() {
         this.type = "Basic";
@@ -34,9 +43,24 @@ public class Message {
     }
 
     //Found Word
-    public Message(int FoundWordIndex){
+    public Message(int FoundWordIndex, Player player1, Player player2, int cIndex1, int rIndex1, int cIndex2, int rIndex2, String FindersName){
         this.type = "FoundWord";
         this.FoundWordIndex = FoundWordIndex;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.cIndex1 = cIndex1;
+        this.rIndex1 = rIndex1;
+        this.cIndex2 = cIndex2;
+        this.rIndex2 = rIndex2;
+        this.FindersName = FindersName;
+    }
+
+    public Message(Player player1, Player player2, char[][] grid, List<String> WordsUsed){
+        this.type = "Game";
+        this.player1 = player1;
+        this.player2 = player2;
+        this.grid = grid;
+        this.WordsUsed = WordsUsed;
 
     }
     

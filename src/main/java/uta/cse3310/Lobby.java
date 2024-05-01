@@ -7,7 +7,7 @@ public class Lobby {
     private List<Player> players;
     private List<Player> readyQueue;
     private PlayerType gameController; // Added field to track game controller
-    private final int MAX_PLAYERS_PER_GAME = 4; // Maximum players per game
+    private final int MAX_PLAYERS_PER_GAME = 10; // Maximum players 
     private String type = "Lobby";
 
     public Lobby() {

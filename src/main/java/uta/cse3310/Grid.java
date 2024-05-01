@@ -21,7 +21,7 @@ public class Grid {
     public List<String> SolutionArray;
     public List<String> WordsUsed;
     public List<String> WordsUsedLocations;
-    public List<String> WordList;
+    private List<String> WordList;
     static final Random random = new Random();
     public double GridDensity;
 
