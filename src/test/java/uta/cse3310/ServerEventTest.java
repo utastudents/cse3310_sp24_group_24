@@ -1,7 +1,8 @@
 package uta.cse3310;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import uta.cse3310.ServerEvent;
 
 public class ServerEventTest {
 
@@ -17,8 +18,8 @@ public class ServerEventTest {
         ServerEvent serverEvent = new ServerEvent();
 
         serverEvent.YouAre = PlayerType.XPLAYER;
-        serverEvent.GameId = 111;
-        serverEvent.ConnectionID = 345;
+        serverEvent.GameId = 123;
+        serverEvent.ConnectionID = 456;
         serverEvent.type = "ID";
 
         // Assert
