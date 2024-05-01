@@ -322,7 +322,6 @@
                 break;
             case 'Lobby':
                 console.log("Lobby Message Recieved");
-                console.log(message.players);
                 updatePlayerList(message.players);
                 UpdateQueue(message.readyQueue);
                 break;
@@ -468,12 +467,12 @@
 
         function TryToStartGame(){
             const playerName = document.getElementById("playerName").value.trim(); // Get the player's name from the input field
-            const playerNickItems = document.getElementById("playerNick").getElementsByTagName("li");
+            const playerQueue = document.getElementById("playerQueue").getElementsByTagName("li");
 
-            for (var i = 0; i < playerNickItems.length; i++){
-                if(playerNickItems[i].textContent !== playerName){
-                    socket.send("GamePlayer " + playerName + " " + playerNickItems[i].textContent + " ");
-                    console.log("sending " + "GamePlayer " + playerName + " " + playerNickItems[i].textContent + " ");
+            for (var i = 0; i < playerQueue.length; i++){
+                if(playerQueue[i].textContent !== playerName){
+                    socket.send("GamePlayer " + playerName + " " + playerQueue[i].textContent + " ");
+                    console.log("sending " + "GamePlayer " + playerName + " " + playerQueue[i].textContent + " ");
                     break;
                 }
             }
