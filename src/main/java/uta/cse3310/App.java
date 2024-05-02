@@ -126,7 +126,10 @@ public class App extends WebSocketServer {
 
     
     // Add version next to title
-
+    String versionNumber = System.getenv("VERSION");
+    Message typehash = new Message(versionNumber);
+    String versionJSONString = gson.toJson(typehash);
+    broadcast(versionJSONString);
     // Some stuff here that converts from GSON to JSON and send it over to the HTML
 
   }

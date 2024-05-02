@@ -29,7 +29,7 @@ public class Message {
 
     public Message(String versionNumber){
         this.type="typehash";
-        this.versionNumber=versionNumber;
+        this.versionNumber=System.getenv("VERSION");
     }
 
     
