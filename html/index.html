@@ -121,11 +121,10 @@
         socket.onmessage = function(event) {
             console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
-            document.title = "group 24" + message.versionNumber;
 
             switch(message.type){
             case 'typehash':
-            document.title = "group 24" + message.versionNumber;
+            document.title = "group 24: " + message.versionNumber;
             break;
 
             case 'Grid':
