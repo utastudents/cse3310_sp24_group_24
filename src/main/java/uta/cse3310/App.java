@@ -191,7 +191,6 @@ public class App extends WebSocketServer {
       L.addPlayer(P);
 
       // since the lobby has changed, let's send it out to everyone
-  
       String jsonString = gson.toJson(L);
       broadcast(jsonString);
     
