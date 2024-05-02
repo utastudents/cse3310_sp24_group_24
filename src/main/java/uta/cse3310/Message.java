@@ -20,10 +20,16 @@ public class Message {
     private String FindersName;
     private int gameID;
 
+    private String versionNumber= System.getenv("VERSION");
 
     public Message() {
         this.type = "Basic";
         String content;
+    }
+
+    public Message(String versionNumber){
+        this.type="typehash";
+        this.versionNumber=versionNumber;
     }
 
     

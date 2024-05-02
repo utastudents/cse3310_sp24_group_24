@@ -48,6 +48,8 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft;
@@ -68,6 +70,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.lang.*;
+
 public class App extends WebSocketServer {
 
   // All games currently underway on this server are stored in
@@ -84,7 +88,8 @@ public class App extends WebSocketServer {
 
   private Statistics stats;
    // Version number for the project. For project testing and to meet a requirement for grading.
-  private String versionNumber = "Word Game - v" + System.getenv("VERSION");
+   //String version = getVersion();
+  //public String versionNumber = System.getenv("VERSION");
 
 
   public App(int port) {
@@ -121,7 +126,7 @@ public class App extends WebSocketServer {
 
     
     // Add version next to title
-    String version = getVersion();
+
     // Some stuff here that converts from GSON to JSON and send it over to the HTML
 
   }
@@ -156,6 +161,12 @@ public class App extends WebSocketServer {
 
     // Parse the incoming message to extract sender and content
     Gson gson = new Gson();
+
+
+    String versionNumber = System.getenv("VERSION");
+    Message typehash = new Message(versionNumber);
+    String versionJSONString = gson.toJson(typehash);
+    broadcast(versionJSONString);
     
     if (message.startsWith("ChatMessage") == true){
       StringTokenizer string = new StringTokenizer(message,"|");
@@ -283,10 +294,10 @@ public class App extends WebSocketServer {
     stats = new Statistics();
     startTime = Instant.now();
   }
-
+/* 
   public String getVersion() {
     return versionNumber;
-  }
+  }*/
 
   private String escape(String S) {
     // turns " into \"
