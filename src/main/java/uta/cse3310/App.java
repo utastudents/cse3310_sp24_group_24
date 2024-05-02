@@ -167,6 +167,19 @@ public class App extends WebSocketServer {
       broadcast(ChatMessageJSONString);
     }
 
+    if (message.startsWith("Leaderboard") == true){
+      StringTokenizer string = new StringTokenizer(message," ");
+      string.nextToken(); //Get rid of Leaderboard lable
+      String PlayerName = string.nextToken();
+      for(Player i : L.players){
+        if(PlayerName.equals(i.getName())){
+          i.setPoints(1);
+        }
+      }
+      String jsonString = gson.toJson(L);
+      broadcast(jsonString);
+    }
+
     //Checking if the message is a newPlayer message
     if (message.indexOf("newPlayer") > 0) {
       
@@ -221,8 +234,6 @@ public class App extends WebSocketServer {
   
     if(message.startsWith("WordCheck") == true)
     {
-      //change this next line so it can do multiple games
-      
       int j = 0;
       Boolean Found = false;
       StringTokenizer string = new StringTokenizer(message," ");
@@ -237,7 +248,7 @@ public class App extends WebSocketServer {
       {
         if(test.equals(i)){
           System.out.println("ITS ACTUALLY A WORD!");
-          Message FoundWord = new Message(j, G.player1, G.player2, Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name);
+          Message FoundWord = new Message(j, G.player1, G.player2, Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name, G.grid.WordsUsed);
           String FoundWordJSONString = gson.toJson(FoundWord);
           broadcast(FoundWordJSONString);
           Found = true;
@@ -246,7 +257,7 @@ public class App extends WebSocketServer {
         j++;
       }
       if(Found == false){
-        Message FoundWord = new Message(-1, G.player1, G.player2,Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name);
+        Message FoundWord = new Message(-1, G.player1, G.player2,Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), Integer.parseInt(string.nextToken()), name, G.grid.WordsUsed);
         String FoundWordJSONString = gson.toJson(FoundWord);
         broadcast(FoundWordJSONString);
       }

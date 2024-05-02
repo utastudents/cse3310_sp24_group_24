@@ -46,7 +46,7 @@ public class Message {
     }
 
     //Found Word
-    public Message(int FoundWordIndex, Player player1, Player player2, int cIndex1, int rIndex1, int cIndex2, int rIndex2, String FindersName){
+    public Message(int FoundWordIndex, Player player1, Player player2, int cIndex1, int rIndex1, int cIndex2, int rIndex2, String FindersName, List<String> WordsUsed){
         this.type = "FoundWord";
         this.FoundWordIndex = FoundWordIndex;
         this.player1 = player1;
@@ -56,6 +56,7 @@ public class Message {
         this.cIndex2 = cIndex2;
         this.rIndex2 = rIndex2;
         this.FindersName = FindersName;
+        this.WordsUsed = WordsUsed;
     }
 
     public Message(Player player1, Player player2, char[][] grid, List<String> WordsUsed, int gameID){

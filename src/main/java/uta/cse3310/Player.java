@@ -38,7 +38,7 @@ public class Player {
     }
     public int setPoints(int points)
     {
-        this.PlayerPoints = points;
+        this.PlayerPoints += points;
         return points;
     }
 
