@@ -116,13 +116,19 @@
             // Update title to reflect the current version
             // var titleVersion = "  "; // Add the JSON variable for the string
             // document.getElementById("title").innerHTML = titleVersion; // Set the title as the titleVersion
+  
+            document.title = "group 24: " + message.versionNumber;
         };
         
         socket.onmessage = function(event) {
             console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
-           
+
             switch(message.type){
+            case 'typehash':
+                document.title = "group 24: " + message.versionNumber;
+            break;
+
             case 'Grid':
                 console.log("Grid recieved");
                 displayWordSearch(message.grid);
