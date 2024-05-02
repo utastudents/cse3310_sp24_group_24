@@ -202,9 +202,11 @@ body {
 .lobby-page .container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    width: 80%; /* Adjust width as needed */
+    justify-content: center;
+    width: 100%; /* Adjust width as needed */
     height: 80%;
+    background-color:#8ac1b1;
+
 }
 .lobby-page .left-column, .right-column
 {
@@ -286,7 +288,6 @@ body {
 .lobby-page input[type="text"] {
     width: 350px;
     padding: 8px;
-    padding-left: 50px;
     box-sizing: border-box;
     margin-bottom: 10px;
 }
@@ -313,45 +314,4 @@ body {
     align-items: center;
     padding-top: 100px;
    
-}
-
-.game-page{
-    background-color:#8ac1b1;
-}
-.game-page table {
-    border-collapse: collapse;
-    
-}
-.game-page td {
-    border: 1px solid black;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    font-size: 15px;
-    background-color: cadetblue;
-    
-}
-
-.game-page .scroll-box{
-    width: 300px;
-    height: 150px;
-    overflow: auto;
-    border: 1px solid black;
-    padding: 10px;
-}
-.game-page #leftbox{
-    float: left;
-    background-color: lightblue;
-    height: 80%;
-}
-.game-page #centerbox{
-    float: left;
-}
-.game-page #rightbox{
-    float: right;
-    background-color: lightblue;
-    height: 80%;
-}
-.game-page .crossed-out {
-    text-decoration: line-through;
 }
