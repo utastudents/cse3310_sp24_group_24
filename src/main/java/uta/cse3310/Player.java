@@ -36,10 +36,10 @@ public class Player {
     public int getConnectionID(){
         return connectionID;
     }
-    public int setPoints(int points)
+    public void setPoints(int points)
     {
         this.PlayerPoints += points;
-        return points;
+        //return points;
     }
 
     //getter for player list

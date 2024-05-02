@@ -28,8 +28,9 @@ public class Leaderboard
                 break;
             }
         }
-        sortPlayers();
+        sortPlayers(); // Sorting after updating the score
     }
+    
 
    /*  List<player> sorted(int x) // Sort the player
     {
@@ -46,6 +47,10 @@ public class Leaderboard
     }
         });
     }
+    public List<Player> getPlayers() {
+        return players;
+    }
+    
     
         
 
