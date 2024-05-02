@@ -10,10 +10,12 @@ public class WordSearchGame{
     public String word;
     public int numOfWords;
     public String[] Msg;
+    Grid G = new Grid();
 
     WordSearchGame(Statistics sta){
         S = sta;
         S.GamesInProgress++;
+        wordsToFind = new ArrayList<>(G.WordsUsed);
 
         Msg =  new String[2];
         Msg[0] = "Welcome to Word Search Game";
