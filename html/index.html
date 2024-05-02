@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -30,16 +31,16 @@
                 <div class="box">
                     <h1 class="header_text">Nicknames</h1>
                     <ol id="playerNick" class="player-nick"></ol>
-                    <div class = "button-container">
                     <button id="button" onclick="EnterQueue()">Join Queue</button>
-                    </div>
                 </div>
                 <div class="box">
                     <h1 class="header_text">Leaderboard</h1>
                     
                     <ol id="leaderboard" style="list-style-type:none;"></ol>
 
-
+                    <div class="button-container">
+                        <button id="button" onclick="">Click to View</button>
+                    </div>
                 </div>
             </div>
     
@@ -47,8 +48,6 @@
                 <div class="chatbox" id="chatbox">
                     <div class="message bot-message">Display Message</div>
                 </div>
-                <input type="text" id="userInput" placeholder="Type your message...">
-        <button onclick="sendMessage()">Send</button>
             </div>
     
             <div class="right-column">
@@ -63,7 +62,8 @@
             </div>
         </div>
         
-        
+        <input type="text" id="userInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
     </div>
     
     <div class="game-page">
@@ -116,16 +116,19 @@
             // Update title to reflect the current version
             // var titleVersion = "  "; // Add the JSON variable for the string
             // document.getElementById("title").innerHTML = titleVersion; // Set the title as the titleVersion
+  
+            document.title = "group 24: " + message.versionNumber;
         };
         
         socket.onmessage = function(event) {
             console.log('Message from server: ' +  event.data);
             const message = JSON.parse(event.data);
-           
+
             switch(message.type){
             case 'typehash':
                 document.title = "group 24: " + message.versionNumber;
             break;
+
             case 'Grid':
                 console.log("Grid recieved");
                 displayWordSearch(message.grid);
@@ -140,14 +143,32 @@
                 var playerColor = document.getElementById("playerColor").value; 
                 if(playerName === message.player1.PlayerName || playerName === message.player2.PlayerName){
                     playerName = message.FindersName;
+
+                    var foundWord = message.WordsUsed[message.FoundWordIndex];
+                    console.log("found word = " + foundWord);
+
                     if(playerName === message.player1.PlayerName){
                         playerColor = message.player1.PlayerColor;
+                        playerName = message.player1.PlayerName;
+                        if(message.FoundWordIndex != -1){
+                            var leftbox = document.getElementById("leftbox");
+                            var messageElement = document.createElement("div");
+                            messageElement.textContent = "FOUND: " + foundWord;
+                            leftbox.appendChild(messageElement);
+                        }
                     }else{
                         playerColor = message.player2.PlayerColor;
+                        playerName = message.player2.PlayerName;
+                        if(message.FoundWordIndex != -1){
+                            var rightbox = document.getElementById("rightbox");
+                            var messageElement = document.createElement("div");
+                            messageElement.textContent = "FOUND: " + foundWord;
+                            rightbox.appendChild(messageElement);
+                        }
                     }
 
-                    crossOutWord(message.FoundWordIndex, message.cIndex1, message.rIndex1, message.cIndex2, message.rIndex2, playerColor);
-                    //FUNCTION TO ADD FOUND WORD TO SIDE LISTS
+                    crossOutWord(message.FoundWordIndex, message.cIndex1, message.rIndex1, message.cIndex2, message.rIndex2, playerColor, playerName, message.WordsUsed);
+                    //FUNCTION TO ADD FOUND WORD TO SIDE LIST
                 }
                 
                 break;   
@@ -159,6 +180,7 @@
                 console.log("Lobby Message Recieved");
                 updatePlayerList(message.players);
                 UpdateQueue(message.readyQueue);
+                updateLeaderboard(message.players)
                 break;
             case 'Game':
                 console.log("Game Message Recieved");
@@ -176,11 +198,9 @@
                     gameID = message.gameID;
                 }
                 break;
-            case 'sender':
-                updatePlayerList(message.players);
-                if ('sender' in message) {
+            case 'ChatMessage':
+                console.log("ChatMessage Received")
                 displayMessage(message.sender, message.content);
-                }
                 break;
             default:
                 console.log("Unknown message")
@@ -258,22 +278,21 @@
 
         function sendMessage() {
             const userInput = document.getElementById("userInput");
-            const content = userInput.value.trim();
-            const playerName = document.getElementById("playerName").value.trim(); //sessionStorage.getItem('playerName') || 'Anonymous';
+            var content = userInput.value.trim();
+            const playerName = document.getElementById("playerName").value.trim();
             if (content) {
-                const message = { sender: playerName, content: content };
-                socket.send(JSON.stringify(message));
-                console.log("sending "+JSON.stringify(message));
-                displayMessage(`${playerName}: ${content}`, "user-message");
+                const message = "ChatMessage|" + playerName + "|" + content + "|";
+                socket.send(message);
+                console.log("sending " + message);
                 userInput.value = '';
             }
         }
 
-        function displayMessage(message, className) {
+        function displayMessage(sender, content) {
             const chatbox = document.getElementById("chatbox");
             const messageElement = document.createElement("div");
-            messageElement.textContent = message;
-            messageElement.classList.add("message", className);
+
+            messageElement.textContent = sender + ": " + content;
             chatbox.appendChild(messageElement);
             chatbox.scrollTop = chatbox.scrollHeight; // Keep the chat scrolled to the bottom
         }
@@ -382,8 +401,21 @@
         }
 
 
-        let leaderboardData = [];
-        function updateLeaderboard(playerName, score) {
+        //let leaderboardData = [];
+        function updateLeaderboard(players) {
+            const Leaderboard = document.getElementById('leaderboard');
+            Leaderboard.innerHTML = ''; // Clear the existing player list
+
+            // Add each player to the player list in the HTML
+             players.forEach(player => {
+                const li = document.createElement('li');
+                li.textContent = player.PlayerName + " " + player.PlayerPoints;
+                li.style.color = player.PlayerColor
+                li.style.fontSize = "15px";
+                Leaderboard.appendChild(li);
+                });
+
+            /*
             // Check player is in leaderboard
             const existPlayer = leaderboardData.findIndex(player => player.name === playerName);
             
@@ -400,8 +432,10 @@
             
             //update leaderboard
             view_leaderboard();
+            */
         }
 
+        
         function view_leaderboard() {
             // window.location.href = 'Leaderboard.html';
             // causes the page to be loaded
@@ -494,9 +528,8 @@
         socket.send("WordCheck" + " " + playerName + " " + gameID + " (" + cIndexOne + "," + rIndexOne + ")(" + cIndexTwo + "," + rIndexTwo + ") " + cIndexOne + " " + rIndexOne + " " + cIndexTwo + " " + rIndexTwo + " ");
     }
 
-    function crossOutWord(FoundWordIndex, cIndex1, rIndex1, cIndex2, rIndex2, playerColor){
+    function crossOutWord(FoundWordIndex, cIndex1, rIndex1, cIndex2, rIndex2, playerColor, playerName, WordsUsed){
         var WordGrid = document.getElementById('WordGrid');
-        
         
         var ColDiff = (cIndex2 - cIndex1);
         var RowDiff = (rIndex2 - rIndex1);
@@ -506,9 +539,10 @@
         if(FoundWordIndex != -1){
             //Cross Out Word in wordbank IF found word was correct
             var wordBank = document.getElementById('WordBank');
+            
             wordBank.children[FoundWordIndex].classList.add('crossed-out');
-            
-            
+            wordBank.children[FoundWordIndex].style.color = playerColor;
+                        
             //Create line of highlighted boxes to fill out the whole word
             for(var i = 0; i < Math.max(Math.abs(ColDiff), Math.abs(RowDiff)); i++){
                 cell.style.backgroundColor = playerColor;
@@ -527,8 +561,10 @@
                 }
                     cell = row.cells[cIndex1];
                 cell.style.backgroundColor = playerColor;
+
+                
             }
-            
+            socket.send("Leaderboard " + playerName + " ");
         }else{
             //If FoundWordIndex was -1 that means no correct word was found so selected sqaure goes back 
             //to default color
